@@ -3,18 +3,20 @@ library(mvtnorm)
 set.seed(12345)
 
 # artificial data
-n = 100
-p = 10
-Mu = rep(2, p)
-Lambda = matrix(rnorm(2*p)^2, p, 2)
-Psi = rep(1, p)
-Sigma = tcrossprod(Lambda) + diag(c(Psi^2))
+n = 30
+p = 6
+nf = 3
+Mu = rep(0, p)
+Sigma = rep(1, p)
+Lambda = gtools::rdirichlet(p, rep(1,nf))
+Psi = 1 - rowSums(Lambda^2)
+C = (tcrossprod(Lambda) + diag(Psi)) * tcrossprod(Sigma)
 
-x = rmvnorm(n=n, mean=Mu, sigma=Sigma)
+x = rmvnorm(n=n, mean=Mu, sigma=C)
 
 # test factor analysis log likelihood function
-ll1 = fa_llik(x, Mu, Lambda, Psi)
-ll2 = mvtnorm::dmvnorm(x, Mu, Sigma, log=TRUE)
+ll1 = fa_llik(x, Mu, Sigma, Lambda)
+ll2 = mvtnorm::dmvnorm(x, Mu, C, log=TRUE)
 stopifnot(all(ll1 == ll2))
 
 # microbenchmark::microbenchmark(
@@ -23,10 +25,10 @@ stopifnot(all(ll1 == ll2))
 # )
 # 75 vs 170 microseconds
 
-print(fa_mle(x, control=list(maxit=1e6)))
+print(fa_mle(x, 1))
 
-for (nf in 1:4) {
+for (nf in 1:min(p,10)) {
   opt = fa_mle(x, nf)
-  print(fa_bic(opt))
+  print(cbind(nf, opt$AIC, opt$converged), digits=5)
 }
 

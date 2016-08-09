@@ -42,7 +42,7 @@ Sigma_inv1 = solve(Sigma)
 
 LLt = tcrossprod(Lambda_x)
 D = tcrossprod(1/sigma_x/delta_x^2)
-Mmat = - D * solve(diag(rep(1,M)) + LLt %*% diag(Rvec/delta_x^2)) %*% LLt
+Mmat = - D * solve(diag(M) + LLt %*% diag(Rvec/delta_x^2)) %*% LLt
 tau_x = 1/delta_x^2 / sigma_x^2
 Sigma_inv2 = Rmat %*% Mmat %*% t(Rmat) + diag(c(Rmat %*% tau_x))
 
@@ -101,9 +101,49 @@ stopifnot(ll_1 - ll_2 < 1e-14)
 
 
 # compare timings of likelihood calculations
+rm(list=ls())
+
+# define number of ensemble members in the MME and corresponding R matrix
+Rvec = c(1,2,3)
+Rmat = matrix(0, nrow=sum(Rvec), ncol=length(Rvec))
+k = 0
+for (r in 1:length(Rvec)) {
+  for (rr in 1:Rvec[r]) {
+    k = k+1
+    Rmat[k, r] = 1
+  }
+}
+
+# framework specifications (model-level)
+S = 1
+M = length(Rvec)
+Lambda_x = matrix(NA_real_, nrow=M, ncol=S)
+for (m in 1:M) {
+  Lambda_x[m, ] = sqrt(gtools::rdirichlet(S+1, rep(1, S+1))[1:S])
+}
+delta_x = sqrt(1 - rowSums(Lambda_x^2))
+sigma_x = runif(M, 1, 3)
+mu_x = rnorm(M)
+
+# framework specifications (member-level)
+Lambda = Rmat %*% Lambda_x
+delta = drop(Rmat %*% delta_x)
+sigma = drop(Rmat %*% sigma_x)
+mu = drop(Rmat %*% mu_x)
+
+# multivariate normal
+Mu = mu
+Sigma = diag(sigma) %*% (tcrossprod(Lambda) + diag(delta)^2) %*% diag(sigma)
+
+# simulate data
+N = 10
+X = mvtnorm::rmvnorm(N, Mu, Sigma)
+
+
+
 ll_1 = function(X, mu_x, sigma_x, Lambda_x, Rmat) {
   
-  delta_x = 1 - rowSums(Lambda_x^2)
+  delta_x = sqrt(1 - rowSums(Lambda_x^2))
   Lambda = Rmat %*% Lambda_x
   delta = drop(Rmat %*% delta_x)
   sigma = drop(Rmat %*% sigma_x)
@@ -136,6 +176,7 @@ ll_2 = function(X, mu_x, sigma_x, Lambda_x, Rmat) {
   LLt = tcrossprod(Lambda_x)
   D = tcrossprod(1/sigma_x/delta_x^2)
   Mmat = - D * solve(diag(rep(1,M)) + LLt %*% diag(Rvec/delta_x^2)) %*% LLt
+  tau_x = 1/delta_x^2 / sigma_x^2
   trSigmaInvS = sum(Mmat * RSR) + sum(RdiagSR * tau_x)
 
   xm = colMeans(X)
@@ -143,7 +184,14 @@ ll_2 = function(X, mu_x, sigma_x, Lambda_x, Rmat) {
   xm2_x = tapply(xm^2, rep(1:M, Rvec), sum)
   xmusigma = drop(t(xm_x - Rvec*mu_x) %*% Mmat %*% (xm_x - Rvec*mu_x)) + sum(tau_x * xm2_x - 2 * tau_x * mu_x * xm_x + Rvec * tau_x * mu_x^2)
 
-  -N/2 * (sum(Rvec) * log(2*pi) + logdetsigma + trSigmaInvS + xmusigma)
+  return(-N/2 * (sum(Rvec) * log(2*pi) + logdetsigma + trSigmaInvS + xmusigma))
 }
+
+stopifnot(abs(ll_1(X, mu_x, sigma_x, Lambda_x, Rmat) - ll_2(X, mu_x, sigma_x, Lambda_x, Rmat)) < 1e-14)
+
+microbenchmark::microbenchmark(
+ll_1(X, mu_x, sigma_x, Lambda_x, Rmat),
+ll_2(X, mu_x, sigma_x, Lambda_x, Rmat)
+)
 
 
