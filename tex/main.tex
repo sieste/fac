@@ -1,0 +1,444 @@
+\documentclass[12pt]{article}
+
+
+% format author and title
+\usepackage{titling}
+\setlength{\droptitle}{-3cm}
+\pretitle{\LARGE}
+\posttitle{\par}
+\preauthor{\large}
+\postauthor{\newline}
+\predate{\large}
+\postdate{\par}
+
+\author{Stefan Siegert}
+\title{Post-processing multimodel ensembles: A multilevel factor analysis approach}
+\newcommand\authortitle{S. Siegert: MME}
+\date{\today}
+
+
+% paragraphs
+\parindent=0mm
+\parskip=8pt
+
+% single space after period
+\frenchspacing
+
+% margins: text block has golden ratio
+\usepackage[left=2.2in, right=2.2in, top=2.2in, bottom=1.8in]{geometry}
+
+% font
+\usepackage{libertine}
+
+% line spacing
+\linespread{1.1}
+
+% block quote
+\usepackage{csquotes}
+
+% tables, cell borders and cell margins (start without borders, then add as needed to improve legibility, increase cell spacing sparingly)
+% add a bit of cell spacing
+\renewcommand{\arraystretch}{1.5}
+
+% section heading fonts
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\bfseries}{\thesubsection}{1em}{}
+
+% section heading spacing
+\titlespacing\section{0pt}{12pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
+\titlespacing\subsection{0pt}{12pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
+
+% lists, remove item spacing
+\usepackage{enumitem}
+\setlist{nosep}
+
+% footline with short title and page number
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.01pt}
+%\fancyfoot[LE,LO]{\sc{\small\authortitle}}
+\fancyfoot[RE,RO]{\sc{\small Page \thepage\ of\ \pageref{LastPage}}}
+
+
+% maths
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\mat}[1]{\bm{#1}}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\tr}{\text{tr}}
+\newcommand{\var}{\text{Var}}
+
+
+\usepackage{url}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\tableofcontents
+
+\section{Introduction}
+
+multiple ensembles for the same prediction target; ensemble of ensembles; superensemble
+
+MMEs are highly structured data with a (potentially) very rich correlation structure (fill in some details and examples)
+
+Questions:
+How to compare performance of models within an MME?
+How to optimally combine the MME into a single prediction?
+
+We propose a statistical framework to model within-model and between-model variability (variance decomposition)
+
+
+
+\subsection{Literature}
+
+multilevel factor analysis \url{http://dx.doi.org/10.1207/s15327752jpa8402_02}
+
+two-level framework (model, member)
+
+Krishnamurty 1999: Multiple regression for MME \url{http://science.sciencemag.org/content/285/5433/1548.full.pdf+html}
+
+Afshartous 2005: Prediction in multi-level models \url{http://jeb.sagepub.com/content/30/2/109.short} ``The multilevel prediction rule performs best''
+
+
+
+
+
+
+\section{The Signal-plus-noise framework}
+
+\subsection{The signal-plus-noise framework for a single ensemble prediction system}
+
+The signal-plus-noise representation is a widely-used and accepted statistical framework for ensemble forecasts in the climate literature. 
+%
+\begin{align}
+x_{t,r} & = \mu_x + \sigma_x(\lambda_x s_t + \sqrt{1-\lambda_x^2} \epsilon_{t,r})\\
+y_t & = \mu_y + \sigma_y(\lambda_y s_t + \sqrt{1-\lambda_y^2} \epsilon'_t)
+\end{align}
+%
+It is a believable generative joint model for ensemble members and observations, and well-studied in the statistical literature (factor analysis model, latent variable model, random effects model?). 
+The framework models exchangeable ensemble members that are coexchangeable with the observation. 
+Thereby, the framework can model discrepancies in mean, scale, and correlation structure. 
+The framework has found application as a toy model in sensitivity studies, and to infer the skill of actual climate models \cite{kharin, kumar, siegert}.
+
+
+In a multi-model context, the S/N framework can be applied by combining all ensembles into a single super-ensemble, whose members are judged to be exchangeable, and coexchangeable with the observations.
+We will address the question how to extend the S/N framework to a more flexible framework to account for differences between the individual models.
+
+
+
+
+
+
+\subsection{The extended S/N model for multi-model ensembles}
+
+For further discussions, it will be useful to treat the observation as a one-member ensemble.
+Then a decomposition of forecast and observation data into signal plus noise is written as
+%
+\begin{align}
+x_{t,m,r} & = \mu_{x,m} + \sigma_{x,m}(\lambda_m s_t + \sqrt{1-\lambda_m^2} \epsilon_{t,m,r})
+\end{align}
+%
+every ensemble sees the same signal, but can have different mean, different scale, and different SNR.
+
+
+
+A straightforward extension of the signal-plus-noise model is to assume the existence of multiple signals $s_t$ instead of only one. 
+That is, we represent the ``systematic'' part of the data as a superposition of $S$ mutually independent signals:
+%
+\begin{align}
+x_{t,m,r} & = \mu_{x,m} + \sigma_{x,m}\left(\sum_{j=1}^S \lambda_{m,j} s_{j,t} + \sqrt{1-\sum_{j=1}^S \lambda_{m,j}^2} \epsilon_{t,m,r}\right)
+\end{align}
+%
+For example $S=2$ was used in Weigel et al to represent common model error. (more on the Weigel model, also comment on triple collocation).
+
+
+
+We next formulate the general model in matrix notation.
+Define the data vector $\vec{x}_t = (x_{t,1,1}, x_{t,2,1}, \dots,x_{t,2,R_2}, \dots x_{t,M,R_M})'$ where $x_{t,m,r}$ denotes the $r$th ensemble member of the $m$th model at time $t$.
+The first value $x_{t,1,1}$ corresponds to the observation at time $t$.
+A generative statistical model for the data vector $\vec{x}_t$ that is based on the signal-plus-noise concept is written as
+%
+\begin{align}
+\vec{x}_t = \vec{\mu} + \diag(\vec{\sigma}) (\mat{\Lambda} \vec{s}_t + \diag(\vec{\delta}) \vec{\epsilon}_t)
+\end{align}
+%
+where 
+%
+\begin{align}
+\vec{x}_t, \vec{\mu}, \vec{\sigma}, \vec{\delta}, \vec{\epsilon}_t & \in \mathbb{R}^{R\times 1}\\
+\vec{s}_t & \in \mathbb{R}^{S\times 1}\\
+\mat{\Lambda} = (\vec{\lambda}_1, \dots, \vec{\lambda}_R)' & \in \mathbb{R}^{R\times S}\\
+t & = 1, \dots, N
+\end{align}
+%
+$\diag(\vec{v})$ denotes the matrix with diagonal elements equal to the elements of the vector $\vec{v}$ and zero off-diagonal elements.
+$R=\sum_{m=1}^M R_m$ is the total number of values in the data vector $\vec{x}_t$, i.e. observation and all ensemble members of the multi-model ensemble.
+$M$ is the total number of models in the MME, plus one for the observation.
+$S$ is the number of signals used in the framework.
+Furthermore, we set 
+%
+\begin{align}
+(\vec{\delta})_i = \sqrt{1 - \vec{\lambda}_i^T\vec{\lambda}_i}
+\end{align} 
+%
+for $i = 1, \dots, R$ which ensures that the elements of $\vec{\sigma}$ represent the total variability, i.e. $\var[(\vec{x}_t)_i] = (\vec{\sigma})_i^2$.
+This creates a constraint on the elements of $\mat{\Lambda}$: The sum of squared elements along the rows of $\mat{\Lambda}$ cannot exceed one.
+
+
+Ensemble members from the same model are treated as exchangeable. 
+Exchangeability implies that means, variances, and covariances between ensemble members within each model are equal.
+The assumed within-model exchangeability is modelled by setting those rows in $\vec{\mu}$, $\vec{\sigma}$, $\mat{\Lambda}$, $\vec{\delta}$ that correspond to ensemble members of the same model to be equal.
+Mathematically, equality is achieved by the $(0,1)$-matrix $\mat{R} \in \{0,1\}^{R\times M}$ which has exactly one 1 per row:
+%
+\begin{align}
+\mat{R} = \left( \begin{matrix} 1 & 0 & 0 & \cdots \\ 0 & 1 & 0 & \cdots \\ \vdots & \vdots & \vdots & \\ 0 & 1 & 0 & \cdots \\ 0 & 0 & 1 & \cdots \\ \vdots & \vdots & \vdots & \\  \end{matrix}\right)
+\end{align}
+%
+Setting $\mat{R}_{i,m} = 1$ indicates that the $i$th entry of $\vec{x}_t$ corresponds to the $m$th ensemble (or observation if $m=1$).
+To give an example, assume we have 1 observation and two ensembles with 2 and 3 members, respectively.
+The matrix $\mat{R}$ is given by
+%
+\begin{align}
+\mat{R} = \left( \begin{matrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \\0 & 0 & 1 \\  0 & 0 & 1 \end{matrix} \right)
+\end{align}
+%
+and we can transform the reduced mean vector $\vec{\mu}^* = (\mu_1, \mu_2, \mu_3)'$ into the the block mean vector $\vec{\mu} = (\mu_1, \mu_2, \mu_2, \mu_3, \mu_3, \mu_3)'$ by multiplication:
+%
+\begin{align}
+\vec{\mu} = \mat{R} \vec{\mu}^*
+\end{align}
+%
+The matrix $\mat{R}$ transforms the parameters from the model level, where parameter vectors and matrices have dimension $M$, to the member level, where the dimension is $R$. 
+We similarly define $\mat{\Lambda}^*$, $\vec{\delta}^*$, and $\vec{\sigma}^*$ by
+%
+\begin{align}
+\mat{\Lambda} & = \mat{R}\mat{\Lambda}^*\\
+\vec{\delta} & = \mat{R}\vec{\delta}^*\\
+\vec{\sigma} & = \mat{R}\vec{\sigma}^*
+\end{align}
+%
+where the starred parameters describe the data on the model-level, and the non-starred parameters describe the data on the member level.
+
+
+
+\subsection{Parameter estimation}
+
+Conditional on the constant model parameters $\vec{\mu}$, $\vec{\sigma}$, and $\mat{\Lambda}$, the data vectors $\vec{x}_1,\dots,\vec{x}_N$ are independent random variables from a multivariate Normal distribution with mean vector $\vec{\mu}=\mat{R}\vec{\mu}^*$, and the $R\times R$ covariance matrix $\mat{\Sigma}$, which is given by
+%
+\begin{align}
+\mat{\Sigma} = & \diag(\vec{\sigma}) \left( \mat{\Lambda} \mat{\Lambda}' + \diag(\vec{\delta})^2 \right) \diag(\vec{\sigma})
+\label{eq:sigma}
+\end{align}
+%
+We mentioned before that due to exchangeability of members within each model, $\mat{\Sigma}$ is highly structured -- many elements of $\mat{\Sigma}$ are equal.
+The structure of $\mat{\Sigma}$ is expressed using the matrix $\mat{R}$, by substituting $\mat{R}\vec{\sigma}^*$ etc into eq. \ref{eq:sigma}.
+%
+
+
+(Comments on number of free parameters, factor analysis, orthogonal transformations, and dimensionality reduction.)
+%Note that $\mat{\Sigma}$ does not change if $\mat{\Lambda}$ (or $\mat{\Lambda}^*$) is right-multiplied by an orthogonal matrix $\mat{Q}$ (satisfying $\mat{Q}\mat{Q}'=\mat{1}$).
+%Therefore, $\mat{\Lambda}$ cannot be inferred uniquely, but only up to an orthogonal transformation.
+
+(Compare number of free parameters between $\mat{\Sigma}$ and the ($\vec{\sigma}, \mat{\Lambda}$)-parametrisation, argue that method of moments does not always provide unique solutions, comment on triple collocation)
+
+
+For statistical inference by maximum likelihood estimation of Bayesian inference, we have to evaluate the Normal likelihood function, which depends on $\mat{\Sigma}^{-1}$ and $\log|\mat{\Sigma}|$.
+We show in the appendix how the structure of $\mat{\Sigma}$ can be exploited to greatly reduce the complexity of the likelihood calculation.
+
+
+\subsection{Post-processing: The posterior predictive distribution}
+
+The S/N model parametrises the covariance matrix of a multivariate Normal distribution for the observations and MME forecasts.
+We can thus work out the conditional distribution of the observation $y_t$, given the MME forecast $\vec{x}_t$.
+For fixed parameter values $\vec{\theta}$, the conditional distribution is a Normal distribution 
+%
+\begin{align}
+y_t | x_t, \theta \sim \mathcal{N}(m_t, P_t)
+\end{align}
+with
+\begin{align}
+m_t & = \mu_y + \mat{\Sigma}_{1\bullet}\mat{\Sigma}_{\bullet\bullet}^{-1}(\vec{x}_t - \vec{\mu}_{\bullet}) \\
+P_t & = \mat{\Sigma}_{11} - \mat{\Sigma}_{1\bullet}\mat{\Sigma}_{\bullet\bullet}^{-1}\mat{\Sigma}_{\bullet 1}
+\end{align}
+%
+Since the parameter vector $\vec{\theta}$ is not known exactly, but only its posterior distribution $p(\vec{\theta} | \mat{X})$ is known, we have to integrate over the posterior.
+The posterior predictive distribution is given by
+%
+\begin{align}
+p(y_t | \vec{x}_t, D_{-t}) = \int d\vec{\theta}\ p(y_t|\vec{x}_t, \vec{\theta}) p(\vec{\theta} | D_{-t})
+\end{align}
+%
+
+
+\subsection{The case $S=1$}
+
+In the case of $S=1$, i.e., a single signal-variable, the expressions simplify and more insight can be gained into the framework.
+
+
+when does the framework reduce to linear regression on the MMM
+
+when does the framework reduce to multiple linear regression on the individual ensemble means
+
+
+
+\section{Model selection: Is there more than one predictable signal?}
+
+How should the number of signals $S$ be chosen?
+
+
+The total number of parameters in the statistical model depends on $S$, so $S$ acts as a dimensionality reduction for more robust inference.
+
+
+We can invoke arguments on theoretical grounds. 
+Does the chosen framework reproduce data that conform with our beliefs about the underlying system. 
+For example, the one-signal model implies that all models have the same correlation with the observations in the limit of infinite ensemble sizes. 
+Do we believe this?
+If we think that different ensemble forecasting systems have different skill, we must choose more than one signal.
+
+
+There are arguments on practical grounds. 
+How well does the model fit the data? 
+How does the predictive performance depend on the model specification?
+We might believe a multiple-signal framework to be a better model, but then find the one-signal framework to provide better predictions.
+
+
+leave-one-out log predictive density, simplification in sampling-based statistical inference 
+
+
+\section{Inference}
+
+
+\subsection{Point estimation}
+
+method of moments
+
+maximum likelihood
+
+document improved performance by using the simplification
+
+
+\subsection{Bayesian inference}
+
+posterior probability distribution
+
+numerical MCMC
+
+limited benefits from using the reduced likelihood function in STAN
+
+
+\subsection{Prior specification}
+
+We use informative priors to include substantive knowledge about the modelled process, and to rule out a priori unreasonable parameter values.
+
+
+We specify priors on observable quantities, such as ensemble mean, total variance, and correlation coefficients, and translate those into prior distributions on model parameters.
+
+Normal prior on mean parameters
+
+Gamma prior on variance parameters
+
+Dirichlet priors on rows of $\mat{\Lambda}$ squared.
+
+
+
+
+\section{Application to seasonal MME forecasts of ENSO and NAO}
+
+
+\section{Appendix}
+\subsection{Fast calculation of the likelihood function}
+
+The S/N model assumes a joint multivariate Normal distribution of ensemble member forecasts and observations.
+The log-likelihood function of the multivariate normal distribution is given by 
+%
+\begin{align}
+\begin{aligned}
+\ell(\mat{X} | \vec{\mu}, \mat{\Sigma}) = & -\frac{N}{2}\bigg[R \log(2\pi) + \log|\mat{\Sigma}| \\
+& + \tr(\mat{\Sigma}^{-1} \mat{S}) + (\bar{\vec{x}} - \vec{\mu})'\mat{\Sigma}^{-1}(\bar{\vec{x}}-\vec{\mu})\bigg]
+\end{aligned}
+\end{align}
+%
+ where $\mat{X} = (\vec{x}_1, \dots, \vec{x}_N)'$ is the data matrix, where
+%
+\begin{align}
+\mat{S} = \frac{1}{N} \sum_{t=1}^N (\vec{x}_t - \bar{\vec{x}})(\vec{x}_t - \bar{\vec{x}})'
+\end{align}
+is the sample covariance matrix, and
+\begin{align}
+\bar{\vec{x}} = \frac{1}{N} \sum_{t=1}^N \vec{x}_t
+\end{align}
+is the sample mean vector.
+Calculating $\mat{\Sigma}^{-1}$ to evaluate the log-likelihood function requires inversion of the $R \times R$ matrix $\mat{\Sigma}$ which can be computationally expensive if the ensemble gets large.
+The complexity can be greatly reduced by exploiting the structure in $\mat{\Sigma}$.
+The inverse covariance matrix can be written as
+%
+\begin{align}
+\mat{\Sigma}^{-1} = \mat{R} \mat{M} \mat{R}' + \diag(\mat{R}\vec{\tau}^*)
+\label{eq:repr_sigma_inv}
+\end{align}
+%
+where
+%
+\begin{align}
+(\vec{\tau}^*)_i = \frac{1}{(\vec{\delta}^*)_i^2 (\vec{\sigma}^*)_i^2}\ \forall\ i=1,\dots,M
+\end{align}
+%
+and
+%
+\begin{align}
+\begin{aligned}
+\mat{M} = & - \diag(\vec{\sigma}^* \circ \vec{\delta}^* \circ \vec{\delta}^*)^{-1} \big[ \mat{1}_M + \mat{\Lambda}^*\mat{\Lambda}^{*'}\\ 
+& \mat{R}'\mat{R}\diag(\vec{\delta}^*)^{-2} \big]^{-1} \mat{\Lambda}^* \mat{\Lambda}^{*'} \diag(\vec{\sigma}^* \circ \vec{\delta}^* \circ \vec{\delta}^*)^{-1} 
+\end{aligned}
+\end{align}
+%
+where $\vec{v} \circ \vec{w}$ denotes the Hadamard product, i.e. element-wise multiplation, $(\vec{v} \circ \vec{w})_i = (\vec{v})_i (\vec{w})_i$ (cf. the review by Henderson and Searle 1981 on inverting sums of matrices).
+$\mat{\Sigma}^{-1}$ inherits the block structure of $\mat{\Sigma}$.
+Therefore, we have
+%
+\begin{align}
+\tr(\mat{\Sigma}^{-1} \mat{S}) = & \tr(\mat{M}\mat{R}'\mat{S}\mat{R}) + \tr(\diag(\vec{\tau}^*) \mat{R}'\diag(\mat{S})\mat{R}).
+\end{align}
+%
+The $M\times M$ matrix $\mat{R}'\mat{S}\mat{R}$ is the matrix of block sums of the sample covariance matrix, i.e.
+For example, the element $(2,3)$ of $\mat{R}'\mat{S}\mat{R}$ is the sum of covariances between all possible pairs of members from the second and third model.
+Likewise, $\mat{R}'\diag(\mat{S})\mat{R}$ is the $(M\times M)$ matrix with diagonal elements equal to the sums of variances of the members within each model.
+The term $\tr(\mat{\Sigma}^{-1}\mat{S})$ of the likelihood function thus depends only on the within-block sums of sample variances and sample covariances.
+
+Next, note that 
+%
+\begin{align}
+\begin{aligned}
+& (\bar{\vec{x}} - \vec{\mu})'\mat{\Sigma}^{-1}(\bar{\vec{x}}-\vec{\mu})\\
+ = &(\mat{R}'\bar{\vec{x}} - \mat{R}'\vec{\mu})' \mat{M} (\mat{R}'\bar{\vec{x}} - \mat{R}'\mat{\mu})\\ 
+& + (\mat{R}'\bar{\vec{x}}-\mat{R}'\vec{\mu})'\diag(\vec{\tau}^*)(\mat{R}'\bar{\vec{x}}-\mat{R}'\vec{\mu}).
+\end{aligned}
+\end{align}
+%
+The previous equations show that the sufficient statistics of the S/N model are the within-model block sums of covariances, variances, and means.
+
+
+Using the Matrix Determinant Lemma, we can simplify $\log|\mat{\Sigma}|$ as follows.
+%
+\begin{align}
+\log|\mat{\Sigma}| = & \log|\mat{1}_S + \mat{\Lambda}'\mat{R}'\diag(\vec{\delta})^{-2}\mat{R}\mat{\Lambda}|\\
+& + 2\sum_{m=1}^M R_m\log[(\vec{\delta}^*)_m(\vec{\sigma}^*)_m]
+\end{align}
+%
+
+
+
+
+
+
+\end{document}
+

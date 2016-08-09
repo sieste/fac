@@ -1,0 +1,16 @@
+\contentsline {section}{\numberline {1}Introduction}{2}
+\contentsline {subsection}{\numberline {1.1}Literature}{2}
+\contentsline {section}{\numberline {2}The Signal-plus-noise framework}{3}
+\contentsline {subsection}{\numberline {2.1}The signal-plus-noise framework for a single ensemble prediction system}{3}
+\contentsline {subsection}{\numberline {2.2}The extended S/N model for multi-model ensembles}{4}
+\contentsline {subsection}{\numberline {2.3}Parameter estimation}{7}
+\contentsline {subsection}{\numberline {2.4}Post-processing: The posterior predictive distribution}{8}
+\contentsline {subsection}{\numberline {2.5}The case $S=1$}{8}
+\contentsline {section}{\numberline {3}Model selection: Is there more than one predictable signal?}{9}
+\contentsline {section}{\numberline {4}Inference}{10}
+\contentsline {subsection}{\numberline {4.1}Point estimation}{10}
+\contentsline {subsection}{\numberline {4.2}Bayesian inference}{10}
+\contentsline {subsection}{\numberline {4.3}Prior specification}{10}
+\contentsline {section}{\numberline {5}Application to seasonal MME forecasts of ENSO and NAO}{11}
+\contentsline {section}{\numberline {6}Appendix}{11}
+\contentsline {subsection}{\numberline {6.1}Fast calculation of the likelihood function}{11}
