@@ -26,9 +26,6 @@ stopifnot(all(ll1 == ll2))
 # 75 vs 170 microseconds
 
 print(fa_mle(x, 1))
-
-for (nf in 1:min(p,10)) {
-  opt = fa_mle(x, nf)
-  print(cbind(nf, opt$AIC, opt$converged), digits=5)
-}
+print(fa_mle(x, 2))
+print(fa_mle(x, 3))
 

@@ -1,9 +1,11 @@
 #' Calculate factor analysis log-likelihood function
 #'
 
-fa_llik = function(x, Mu=rep(0,p), Sigma=rep(1,p), Lambda=matrix(0, p, 1)) {
+fa_llik = function(x, Mu=rep(0,p), Sigma=rep(1,p), Lambda=matrix(0, p, 1), Psi=NULL) {
   p = ncol(x)
-  Psi = 1 - rowSums(Lambda^2)
+  if (is.null(Psi)) {
+    Psi = 1 - rowSums(Lambda^2)
+  }
   C = (tcrossprod(Lambda) + diag(Psi)) * tcrossprod(sqrt(Sigma))
   dec = chol(C)
   tmp = backsolve(dec, t(x) - Mu, transpose=TRUE)
@@ -18,13 +20,20 @@ fa_llik = function(x, Mu=rep(0,p), Sigma=rep(1,p), Lambda=matrix(0, p, 1)) {
 #' (adopted from stats:::factanal.mle.fit, 30% faster by optimising matrix
 #'  operations)
 #'
-fa_mle = function(x, nf=1) {
+fa_mle = function(x, nf=1, scaled=FALSE, Psi.fixed=NULL) {
+
   p = ncol(x)
   n = nrow(x)
 
   # mles of mu and sigma
-  Mu = colMeans(x)
-  Sigma = colMeans(x^2) - Mu^2
+  if (scaled) {
+    x = scale(x)
+    Mu = rep(0, p)
+    Sigma = rep(1, p)
+  } else {
+    Mu = colMeans(x)
+    Sigma = colMeans(x^2) - Mu^2
+  }
   
   # correlation matrix
   S = cor(x)
@@ -51,16 +60,22 @@ fa_mle = function(x, nf=1) {
     return(g/Psi^2)
   }
 
-  start = (1 - 0.5 * nf/p)/diag(solve(S))
-  res   = optim(start, FAfn, FAgr, method = "L-BFGS-B", lower = 0.1, 
-              upper = 1, control = list(fnscale = 1, parscale = rep(0.01, 
-              length(start))), q = nf, S = S)
+  if (missing(Psi.fixed)) {
+    start = (1 - 0.5 * nf/p)/diag(solve(S))
+    res   = optim(start, FAfn, FAgr, method = "L-BFGS-B", lower = 0.1, 
+                  upper = 1, control = list(fnscale = 1, parscale = rep(0.01, 
+                  length(start))), q = nf, S = S)
+  } else {
+    res = list(par=Psi.fixed, convergence=0)
+  }
 
   Lambda = FAout(res$par, S, nf)
-  dof    = p * (nf + 3) - 0.5 * nf * (nf - 1)
-  Psi    = 1 - rowSums(Lambda^2)
-  AIC    = -2. * sum(fa_llik(x, Mu, Sigma, Lambda)) + 2. * dof
-  BIC    = -2. * sum(fa_llik(x, Mu, Sigma, Lambda)) + log(n) * dof
+  dof    = length(Lambda) - 0.5 * nf * (nf - 1) +
+           ifelse(scaled, 0, length(Mu)+length(Sigma)) + 
+           ifelse(missing(Psi.fixed), 0, -length(Psi.fixed))
+  Psi    = res$par
+  AIC    = -2. * sum(fa_llik(x, Mu, Sigma, Lambda, Psi)) + 2. * dof
+  BIC    = -2. * sum(fa_llik(x, Mu, Sigma, Lambda, Psi)) + log(n) * dof
   ans    = list(Mu = Mu, Sigma=Sigma, Lambda=Lambda, Psi=Psi,
                 AIC=AIC, BIC=BIC, converged = res$convergence == 0, dof=dof)
 
