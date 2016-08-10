@@ -82,4 +82,41 @@ fa_mle = function(x, nf=1, scaled=FALSE, Psi.fixed=NULL) {
   return(ans)
 }
  
+#' reconstruct convariance matrix from factor analysis
+fa_to_sigma = function(fa) {
+  C = with(fa, (tcrossprod(Lambda)+diag(Psi)) * tcrossprod(sqrt(Sigma)))
+  return(C)
+}
+
+
+#' Model selection using leave-one-out predictive density
+#'
+fa_loo = function(x, y, nf=1) {
+
+  data = cbind(y, x)
+  n = length(y)
+  score = 0
+  for (i in 1:n) {
+
+    # covariance matrix from MLE FA
+    fa = fa_mle(data[-i, ], nf=nf)
+    M = fa[['Mu']]
+    C = fa_to_sigma(fa)
+
+    # regression
+    M_x = M[-1]
+    M_y = M[1]
+    C_yy = C[1, 1, drop=TRUE]
+    C_yx = C[1, -1, drop=FALSE]
+    C_xx_inv = solve(C[-1, -1])
+    C_xy = C[-1, 1, drop=FALSE]
+    
+    M_p = M_y + drop(C_yx %*% C_xx_inv %*% (x[i, ] - M_x))
+    C_p = C_yy - drop(C_yx %*% C_xx_inv %*% C_xy)
+
+    # increment leave-one-out score
+    score = score - dnorm(y[i], M_p, sqrt(C_p), log=TRUE)
+  }
+  return(score/n)
+}
 
