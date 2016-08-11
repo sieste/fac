@@ -20,7 +20,7 @@ fa_llik = function(x, Mu=rep(0,p), Sigma=rep(1,p), Lambda=matrix(0, p, 1), Psi=N
 #' (adopted from stats:::factanal.mle.fit, 30% faster by optimising matrix
 #'  operations)
 #'
-fa_mle = function(x, nf=1, scaled=FALSE, Psi.fixed=NULL) {
+fa_mle = function(x, nf=1L, scaled=FALSE, Psi.lower=1e-6, warn.overpar=FALSE) {
 
   p = ncol(x)
   n = nrow(x)
@@ -60,24 +60,24 @@ fa_mle = function(x, nf=1, scaled=FALSE, Psi.fixed=NULL) {
     return(g/Psi^2)
   }
 
-  if (missing(Psi.fixed)) {
-    start = (1 - 0.5 * nf/p)/diag(solve(S))
-    res   = optim(start, FAfn, FAgr, method = "L-BFGS-B", lower = 0.1, 
-                  upper = 1, control = list(fnscale = 1, parscale = rep(0.01, 
-                  length(start))), q = nf, S = S)
-  } else {
-    res = list(par=Psi.fixed, convergence=0)
-  }
+  start = (1 - 0.5 * nf/p)/diag(solve(S))
+  res   = optim(start, FAfn, FAgr, method = "L-BFGS-B", lower = Psi.lower,
+                upper = 1, control = list(fnscale = 1, parscale = rep(0.01, 
+                length(start))), q = nf, S = S)
 
   Lambda = FAout(res$par, S, nf)
+  rownames(Lambda) = colnames(x)
   dof    = length(Lambda) - 0.5 * nf * (nf - 1) +
-           ifelse(scaled, 0, length(Mu)+length(Sigma)) + 
-           ifelse(missing(Psi.fixed), 0, -length(Psi.fixed))
+           ifelse(scaled, 0, length(Mu)+length(Sigma))
   Psi    = res$par
   AIC    = -2. * sum(fa_llik(x, Mu, Sigma, Lambda, Psi)) + 2. * dof
   BIC    = -2. * sum(fa_llik(x, Mu, Sigma, Lambda, Psi)) + log(n) * dof
+  s      = .5 * (p - nf)^2 - .5 * (p + nf)
+  if (warn.overpar & s < 0) {
+    warning('overparametrised model')
+  }
   ans    = list(Mu = Mu, Sigma=Sigma, Lambda=Lambda, Psi=Psi,
-                AIC=AIC, BIC=BIC, converged = res$convergence == 0, dof=dof)
+                AIC=AIC, BIC=BIC, converged = res$convergence == 0, dof=dof, s=s)
 
   return(ans)
 }
@@ -91,7 +91,7 @@ fa_to_sigma = function(fa) {
 
 #' Model selection using leave-one-out predictive density
 #'
-fa_loo = function(x, y, nf=1) {
+fa_loo = function(x, y, nf=1, sph=FALSE, ...) {
 
   data = cbind(y, x)
   n = length(y)
@@ -99,7 +99,11 @@ fa_loo = function(x, y, nf=1) {
   for (i in 1:n) {
 
     # covariance matrix from MLE FA
-    fa = fa_mle(data[-i, ], nf=nf)
+    if (!sph) {
+      fa = fa_mle(data[-i, ], nf=nf, ...)
+    } else {
+      fa = fa_mle_sph(data[-i, ], nf=nf, ...)
+    }
     M = fa[['Mu']]
     C = fa_to_sigma(fa)
 
@@ -119,4 +123,77 @@ fa_loo = function(x, y, nf=1) {
   }
   return(score/n)
 }
+
+
+#' Rotation of factor loadings
+#'
+varimax = function(Lambda) {
+  p = nrow(Lambda)
+  nf = ncol(Lambda)
+  if (nf <= 1) {
+    return(Lambda)
+  }
+
+  # scale rows
+  sc = sqrt(rowSums(Lambda^2))
+  Lambda = Lambda / sc
+
+  # iterative algorithm by 
+  TT = diag(nf)
+  d = 0
+  for (i in 1L:1000L) {
+    z = Lambda %*% TT
+    B = crossprod(Lambda, z^3 - z * rep(rep(1/p, p) %*% z^2, each=p))
+    sB = La.svd(B)
+    TT = sB$u %*% sB$vt
+    dpast = d
+    d = sum(sB$d)
+    if (d < dpast * (1+1e-5)) {
+      break
+    }
+  }
+  z = Lambda %*% TT
+  z = z * sc
+  dimnames(z) = dimnames(Lambda)
+  return(z)
+}
+
+
+#' mle factor analysis with spherical noise
+#' a la stoica/jansson 2008 doi:10.1016/j.sigpro.2009.01.002
+#' 
+fa_mle_sph = function(x, nf=1L, warn.overpar=FALSE) {
+
+  p = ncol(x)
+  n = nrow(x)
+
+  # mles of mu and sigma
+  Mu = colMeans(x)
+  Sigma = colMeans(x^2) - Mu^2
+  
+  # correlation matrix
+  R = cor(x)
+  eig = eigen(R)
+  l = eig$values[1L:nf]
+  Psi = sum(eig$values[(nf+1L):p]) / (p - nf)
+  A = eig$vectors[, 1L:nf, drop=FALSE]
+  Lambda = A * rep(sqrt(l-Psi), each=p)
+
+  Psi = rep(Psi, p)
+  names(Psi) = colnames(x)
+  rownames(Lambda) = colnames(x)
+  dof    = length(Lambda) - 0.5 * nf * (nf - 1) + length(Mu) + length(Sigma)
+  AIC    = -2. * sum(fa_llik(x, Mu, Sigma, Lambda, Psi)) + 2. * dof
+  BIC    = -2. * sum(fa_llik(x, Mu, Sigma, Lambda, Psi)) + log(n) * dof
+  s      = .5 * (p - nf)^2 - .5 * (p + nf)
+  if (warn.overpar & s < 0) {
+    warning('overparametrised model')
+  }
+  ans    = list(Mu=Mu, Sigma=Sigma, Lambda=Lambda, Psi=Psi,
+                AIC=AIC, BIC=BIC, converged=TRUE, dof=dof, s=s)
+
+  return(ans)
+  
+}
+
 
