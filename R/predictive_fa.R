@@ -16,25 +16,26 @@ nino = list(
 
 x = sapply(nino, rowMeans)
 y = drop(as.matrix(read.table('../data/obs_tos_nino34_data.txt') - 273.15))
+Psi.lower = sapply(nino, function(x) mean(apply(x, 1, var)/ncol(x)))
 
-fa_loo(x, y, nf=1) # 0.852
-fa_loo(x, y, nf=2) # 0.838
-fa_loo(x, y, nf=3) # 0.850
-fa_loo(x, y, nf=4) # 0.853
+print(fa_loo(x, y, nf=1, Psi.lower=c(1e-6, Psi.lower))) 
+print(fa_loo(x, y, nf=2, Psi.lower=c(1e-6, Psi.lower))) 
+print(fa_loo(x, y, nf=3, Psi.lower=c(1e-6, Psi.lower))) 
+print(fa_loo(x, y, nf=4, Psi.lower=c(1e-6, Psi.lower))) 
 
 
 
-
+print('')
 
 ###############################################################
 # DEMETER NAO data
 ###############################################################
 
 nao = list(
-  #cerfacs = read.table('../data/demeter_nao_cerfacs.dat'),
-  #ingv = read.table('../data/demeter_nao_ingv.dat'),
-  #mpi = read.table('../data/demeter_nao_mpi.dat'),
-  #lodyn = read.table('../data/demeter_nao_lodyn.dat'),
+  cerfacs = read.table('../data/demeter_nao_cerfacs.dat'),
+  ingv = read.table('../data/demeter_nao_ingv.dat'),
+  mpi = read.table('../data/demeter_nao_mpi.dat'),
+  lodyn = read.table('../data/demeter_nao_lodyn.dat'),
   ecmwf = read.table('../data/demeter_nao_ecmwf.dat'),
   metfr = read.table('../data/demeter_nao_metfr.dat'),
   ukmo = read.table('../data/demeter_nao_ukmo.dat'),
@@ -49,13 +50,13 @@ for (i in 1:length(nao)) {
 }
 
 nao_df = nao_df[!is.na(rowSums(nao_df)), -1]
-y = drop(as.matrix(nao_df['obs']))
+y = c(as.matrix(nao_df['obs']))
 x = as.matrix(nao_df[names(nao_df) != 'obs'])
 
-fa_loo(x, y, 1)
-fa_loo(x, y, 2)
-fa_loo(x, y, 3)
-fa_loo(x, y, 4)
+print(fa_loo(x, y, 1, Psi.lower=1e-1))
+print(fa_loo(x, y, 2, Psi.lower=1e-1))
+print(fa_loo(x, y, 3, Psi.lower=1e-1))
+print(fa_loo(x, y, 4, Psi.lower=1e-1))
 
 # optimum is for one factor for most combination, but two factors for x=(ecmwf,
 # metfr, ukmo)
