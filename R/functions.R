@@ -1,6 +1,6 @@
 #' Calculate factor analysis log-likelihood function
 #'
-
+#'
 fa_llik = function(x, Mu=rep(0,p), Sigma=rep(1,p), Lambda=matrix(0, p, 1), Psi=NULL) {
   p = ncol(x)
   if (is.null(Psi)) {
@@ -197,3 +197,61 @@ fa_mle_sph = function(x, nf=1L, warn.overpar=FALSE) {
 }
 
 
+#' penalised likelihood estimation to enforce similarity of specific variances
+#'
+fa_ple = function(x, nf=1L, scaled=FALSE, Psi.lower=1e-6, C=0, warn.overpar=FALSE) {
+  p = ncol(x)
+  n = nrow(x)
+
+  # mles of mu and sigma
+  Mu = colSums(x) / n
+  Sigma = colSums(x^2) / n - Mu^2
+  
+  # correlation matrix
+  S = cor(x)
+
+  FAout = function(Psi, S, q) {
+    Sstar = S * tcrossprod(1/sqrt(Psi))
+    E     = eigen(Sstar, symmetric = TRUE)
+    L     = E$vectors[, 1L:q, drop = FALSE]
+    load  = L * rep(sqrt(pmax(E$values[1L:q] - 1, 0)), each=ncol(S)) * sqrt(Psi)
+    return(load)
+  }
+  FAfn = function(Psi, S, q) {
+    Sstar = S * tcrossprod(1/sqrt(Psi))
+    E     = eigen(Sstar, symmetric = TRUE, only.values = TRUE)
+    e     = E$values[-(1L:q)]
+    nll = -sum(log(e) - e) - q + p + C*var(Psi)*(p-1)/p
+    return(nll)
+  }
+  FAgr = function(Psi, S, q) {
+    Sstar = S * tcrossprod(1/sqrt(Psi))
+    E     = eigen(Sstar, symmetric = TRUE)
+    L     = E$vectors[, 1L:q, drop = FALSE]
+    load  = L * rep(sqrt(pmax(E$values[1L:q] - 1, 0)), each=p) * sqrt(Psi)
+    g     = rowSums(load^2) + Psi - diag(S)
+    return(g/Psi^2 + 2*C/p*Psi*(1-mean(Psi)))
+  }
+
+  start = (1 - 0.5 * nf/p)/diag(solve(S))
+  res   = optim(start, FAfn, FAgr, method = "L-BFGS-B", lower = Psi.lower,
+                upper = 1, control = list(fnscale = 1, parscale = rep(0.01, 
+                length(start))), q = nf, S = S)
+
+  Lambda = FAout(res$par, S, nf)
+  rownames(Lambda) = colnames(x)
+  dof    = length(Lambda) - 0.5 * nf * (nf - 1) +
+           ifelse(scaled, 0, length(Mu)+length(Sigma))
+  Psi    = res$par
+  AIC    = -2. * sum(fa_llik(x, Mu, Sigma, Lambda, Psi)) + 2. * dof
+  BIC    = -2. * sum(fa_llik(x, Mu, Sigma, Lambda, Psi)) + log(n) * dof
+  s      = .5 * (p - nf)^2 - .5 * (p + nf)
+  if (warn.overpar & s < 0) {
+    warning('overparametrised model')
+  }
+  ans    = list(Mu = Mu, Sigma=Sigma, Lambda=Lambda, Psi=Psi,
+                AIC=AIC, BIC=BIC, converged = res$convergence == 0, dof=dof, s=s)
+
+  return(ans)
+
+}
