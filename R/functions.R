@@ -89,21 +89,21 @@ fa_to_sigma = function(fa) {
 }
 
 
-#' Model selection using leave-one-out predictive density
+#' Model selection for factor analysis models using leave-one-out predictive density
 #'
-fa_loo = function(x, y, nf=1, sph=FALSE, ...) {
+#' @param fa_fun a function that takes as input a data matrix, and returns a 
+#'               list with elements Mu (vector), Sigma (vector), Lambda
+#'               (matrix), Psi (vector)
+#'
+fa_loo = function(x, y, fa_fun, nf=1L, ...) {
 
   data = cbind(y, x)
   n = length(y)
   score = 0
-  for (i in 1:n) {
+  for (i in 1L:n) {
 
     # covariance matrix from MLE FA
-    if (!sph) {
-      fa = fa_mle(data[-i, ], nf=nf, ...)
-    } else {
-      fa = fa_mle_sph(data[-i, ], nf=nf, ...)
-    }
+    fa = fa_fun(data[-i, ], nf=nf, ...)
     M = fa[['Mu']]
     C = fa_to_sigma(fa)
 
@@ -125,7 +125,7 @@ fa_loo = function(x, y, nf=1, sph=FALSE, ...) {
 }
 
 
-#' Rotation of factor loadings
+#' VARIMAX rotation of factor loadings
 #'
 varimax = function(Lambda) {
   p = nrow(Lambda)
@@ -197,7 +197,7 @@ fa_mle_sph = function(x, nf=1L, warn.overpar=FALSE) {
 }
 
 
-#' penalised likelihood estimation to enforce similarity of specific variances
+#' penalised likelihood estimation to enforce similarity of the specific variances
 #'
 fa_ple = function(x, nf=1L, scaled=FALSE, Psi.lower=1e-6, C=0, warn.overpar=FALSE) {
   p = ncol(x)
@@ -230,7 +230,7 @@ fa_ple = function(x, nf=1L, scaled=FALSE, Psi.lower=1e-6, C=0, warn.overpar=FALS
     L     = E$vectors[, 1L:q, drop = FALSE]
     load  = L * rep(sqrt(pmax(E$values[1L:q] - 1, 0)), each=p) * sqrt(Psi)
     g     = rowSums(load^2) + Psi - diag(S)
-    return(g/Psi^2 + 2*C/p*Psi*(1-mean(Psi)))
+    return(g/Psi^2 + 2*C/p*(Psi-mean(Psi)))
   }
 
   start = (1 - 0.5 * nf/p)/diag(solve(S))
