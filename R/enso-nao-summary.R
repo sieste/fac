@@ -58,3 +58,30 @@ cat('\n')
 # save for later use (e.g. to simulate similar data)
 save(file='../data/enso-nao.Rdata', list=c('enso', 'nao'))
 
+# plot enso and nao
+pdf('enso_nao.pdf')
+
+yrs = 1982:2010
+plot(NULL, xlim=range(yrs), ylim=c(22,31), ann=FALSE, axes=FALSE)
+lines(yrs, enso[,'obs'], col=gray(.5), lwd=5)
+matlines(yrs, enso[,-1], col='black', lty=1:6)
+legend('topleft', c('obs', 'CFS', 'CMC', 'GFDL', 'METFR', 'NASA', 'ECMWF'), ncol=4, lty=c(1,1:6), col=c(gray(.5), rep('black', 6)), lwd=c(5, rep(1,6)))
+axis(1)
+axis(2, las=2)
+mtext(side=2, text='Nino3.4 index [C]', line=3)
+box()
+
+yrs = 1975:2002
+nao_ = scale(nao)
+plot(NULL, xlim=range(yrs), ylim=c(-3,3), ann=FALSE, axes=FALSE)
+lines(yrs, nao_[,'obs'], col=gray(.5), lwd=5)
+matlines(yrs, nao_[,-1], col='black', lty=1:5)
+legend('topleft', c('obs', 'ECMWF', 'LODYN', 'METFR', 'MPI', 'UKMO'), ncol=3, lty=c(1,1:5), col=c(gray(.5), rep('black', 5)), lwd=c(5, rep(1,5)))
+axis(1)
+axis(2, las=2)
+mtext(side=2, text='NAO index (normalised)', line=3)
+box()
+
+
+dev.off()
+

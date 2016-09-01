@@ -12,10 +12,11 @@
 \postdate{\par}
 
 \author{Stefan Siegert}
-\title{Post-processing multimodel seasonal climate forecasts: When can we expect an improvement from using unequal weighting, and how big is the expected improvement?}
+\title{Post-processing multimodel seasonal climate forecasts: When can we expect an improvement from unequal weighting, and how big is the expected improvement?}
 \newcommand\authortitle{S. Siegert: Post-processing MME}
 \date{\today}
 
+\usepackage{graphicx}
 
 % paragraphs
 \parindent=0mm
@@ -25,7 +26,8 @@
 \frenchspacing
 
 % margins: text block has golden ratio
-\usepackage[left=2.2in, right=2.2in, top=2.2in, bottom=1.8in]{geometry}
+% \usepackage[left=2.2in, right=2.2in, top=2.2in, bottom=1.8in]{geometry}
+\usepackage[left=1.5in, right=1.5in, top=1.5in, bottom=1.5in]{geometry}
 
 % font
 \usepackage{libertine}
@@ -82,260 +84,380 @@
 \maketitle
 \thispagestyle{empty}
 
-\tableofcontents
 
 \section{Introduction}
 
-multiple ensembles for the same prediction target; ensemble of ensembles; superensemble
-
-MMEs are highly structured data with a (potentially) very rich correlation structure (fill in some details and examples)
-
-It has been pointed out that equal weighting is often preferable, even when we have reason to believe that the weights should be different.
-(fill in details, literature, examples relevant to seasonal)
-
-Questions:
-
-How to optimally combine the MME into a single prediction?
-
-When can we expect unequal weighting to be beneficial? 
-
-How big is the expected improvement?
+We usually have multiple ensembles for the same prediction target, i.e., an ensemble of ensembles, sometimes also called a superensemble.
+Multimodel ensembles (MMEs) are highly structured data with a rich correlation structure, i.e., different models have different correlations with the observations, and models also are positively correlated with one another.
+An important questions is how the various models should be optimally combined into a single prediction for future observations.
 
 
-\subsection{Literature}
+It has been pointed out by previous studies that weighting all the models equally is often preferable, even when we have reason to believe that the weights should be different.
+The reason is that there is only a finite amount of data available to estimate the combination weights.
+Random estimation errors of the combination weights degrade the quality of the post-processed forecast, leading to post-processed forecasts that perform worse than weighting the forecasts equally.
 
-DelSole (2013): Is unequal weighting significantly better than equal weighting for multi-model forecasting? (QJ 139, 176--183)
+\begin{itemize}
+\item DelSole (2013): Is unequal weighting significantly better than equal weighting for multi-model forecasting? (QJ 139, 176--183)
+\item Weigel et al (2008) Can multi-model combination really enhance the prediction skill of probabilistic ensemble forecasts? QJ 134:241--260 (2008)
+\item Weigel et al (2010) Risks of model weighting in multimodel climate projections. JCLIM 4175ff
+\end{itemize}
+
+
+In this note, we address questions in this context that have not been addressed in previous studies, namely:
+%
+\begin{itemize}
+\item How should we optimally combine the MME into a single prediction for the observation? In particular, should all forecasts be weighted equally, or should we assign different weights to different forecasts? 
+\item When can we expect unequal weighting to be beneficial, and how big is the expected improvement?
+\end{itemize}
+
 
 
 
 \section{Seasonal forecast data: El Nino Southern Oscillation and the North Atlantic Oscillation}
 
-We use seasonal forecasts of ENSO and NAO.
-(fill in model details)
-
-\subsection{Summary statistics}
-
-ENSO ensemble means and observations: time means, variances (using $1/n$ instead of $1/(n-1)$), and correlations
-
-\begin{verbatim}
-MEANS:
-  obs   cfs   cmc  gfdl    mf  nasa    ec 
-26.70 25.64 25.77 24.89 27.05 25.29 24.82 
-
-STANDARD DEVIATIONS:
- obs  cfs  cmc gfdl   mf nasa   ec 
-1.21 1.41 1.54 1.30 0.67 1.19 1.24 
- 
-CORRELATIONS:
-      obs  cfs  cmc gfdl   mf nasa   ec
-obs  1.00 0.81 0.89 0.85 0.87 0.88 0.91
-cfs  0.81 1.00 0.78 0.89 0.93 0.89 0.86
-cmc  0.89 0.78 1.00 0.82 0.83 0.90 0.91
-gfdl 0.85 0.89 0.82 1.00 0.87 0.93 0.92
-mf   0.87 0.93 0.83 0.87 1.00 0.90 0.90
-nasa 0.88 0.89 0.90 0.93 0.90 1.00 0.94
-ec   0.91 0.86 0.91 0.92 0.90 0.94 1.00
-
-\end{verbatim}
+For illustration, we use seasonal forecasts of El-Ni\~no Southern Oscillation (ENSO) and the North Atlantic Oscillation (NAO).
+The ENSO hindcasts are for the time period 1982--2010 ($n=29$) using model runs that are initialised in August each year, forecasting the Nino3.4 index for December (5 months lead time). 
+The multi-model ensemble (MME) uses forecast runs from ECMWF System4 ($M=51$ members), NCEP CFSv2 ($M=24$), MeteoFrance System3 ($M=11$), GFDL ($M=10$), CMC2 ($M=10$), and NASA ($M=10$).
+The NAO hindcasts are for the time period 1975--2002 ($n=28$) using runs that are initialised in November each year, forecasting average NAO for the following December-February (1-3 months lead time).
+The MME uses data from ECMWF, LODYN, MeteoFrance, MPI, and UK MetOffice that was generated in the DEMETER project.
+Forecast and observation data are shown in Figure \ref{fig:enso-nao}.
+%
+\begin{figure}
+\begin{center}
+\includegraphics[width=.6\textwidth, page=1]{../R/enso_nao.pdf}\\
+\includegraphics[width=.6\textwidth, page=2]{../R/enso_nao.pdf}
+\end{center}
+\caption{ENSO and NAO multi-model forecasts and observations.}
+\label{fig:enso-nao}
+\end{figure}
 
 
-NAO ensemble means and observations: time means, variances, and correlations
+Below we summarise means, variances (using $1/n$ instead of $1/(n-1)$), and correlations of ENSO and NAO data:
+\begin{center}
+\begin{tabular}{c|ccccccc}
+\textbf{ENSO statistics} &  obs  & cfs   &cmc  &gfdl    &mf  &nasa    &ec \\
+\hline
+mean &26.70 &25.64 &25.77 &24.89 &27.05 &25.29 &24.82 \\
+stdev & 1.21 &1.41 &1.54 &1.30 &0.67 &1.19 &1.24\\
+\end{tabular}
 
-\begin{verbatim}
-MEANS:
-   obs  ecmwf  lodyn  metfr    mpi   ukmo 
-   0.6  746.4  704.7 1029.6  740.1  596.2 
-
-STDEVS:
-  obs ecmwf lodyn metfr   mpi  ukmo 
-  1.4 140.1 118.2 158.5 104.1 136.4 
-
-CORRELATIONS:
-        obs  ecmwf lodyn metfr    mpi  ukmo
-obs    1.00 -0.070  0.03  0.18  0.019 -0.14
-ecmwf -0.07  1.000  0.47  0.23 -0.006  0.14
-lodyn  0.03  0.466  1.00  0.16  0.051  0.06
-metfr  0.18  0.230  0.16  1.00 -0.130  0.09
-mpi    0.02 -0.006  0.05 -0.13  1.000 -0.10
-ukmo  -0.14  0.140  0.06  0.09 -0.101  1.00
-\end{verbatim}
-
-
-\section{Optimal weighting by multivariate analysis}
+\begin{tabular}{c|ccccccc}
+\textbf{ENSO correlations}      &obs  &cfs  &cmc &gfdl   &mf &nasa   &ec\\
+\hline
+obs  &1.00 &0.81 &0.89 &0.85 &0.87 &0.88 &0.91\\
+cfs  & &1.00 &0.78 &0.89 &0.93 &0.89 &0.86\\
+cmc  & & &1.00 &0.82 &0.83 &0.90 &0.91\\
+gfdl & & & &1.00 &0.87 &0.93 &0.92\\
+mf   & & & & &1.00 &0.90 &0.90\\
+nasa & & & & & &1.00 &0.94\\
+ec   & & & & & & &1.00
+\end{tabular}
+\end{center}
 
 
-Suppose we knew exactly that the observations and ensemble means in each year were independent draws from multivariate Normal distributions with parameters given by the sample means and correlations above.
-Then it would be straightforward to derive the optimal weights.
-(fill in details)
 
-If the observation $y_t$ and vector of ensemble means $\vec{x}_t = (x^{(1)}_t, \dots, x^{(M)}_t)'$ at time $t$ are draws from a multivariate Normal distribution
+\begin{center}
+\begin{tabular}{c|cccccc}
+\textbf{NAO statistics} & obs  &ecmwf  &lodyn  &metfr    &mpi   &ukmo \\
+\hline
+mean &   0.6  &0.75  &0.70 &1.03  &0.74  &0.60 \\
+stdev &  1.4 &0.14 &0.12 &0.16 &0.10 &0.14 \\
+\end{tabular}
+
+\begin{tabular}{c|cccccc}
+\textbf{NAO correlations} &obs  &ecmwf &lodyn &metfr    &mpi  &ukmo\\
+\hline
+obs    &1.00 &-0.070  &0.03  &0.18  &0.019 &-0.14\\
+ecmwf &  &1.000  &0.47  &0.23 &-0.006  &0.14\\
+lodyn  &  &  &1.00  &0.16  &0.051  &0.06\\
+metfr  &  &  &  &1.00 &-0.130  &0.09\\
+mpi    & &  & &  &1.000 &-0.10\\
+ukmo  &  &  &  & &  &1.00
+\end{tabular}
+\end{center}
+
+
+\section{Optimal combination by multivariate analysis}
+
+For statistical post-processing, it is necessary to make distributional assumptions about the joint behavior of forecasts and observations.
+We will work under the assumption that forecasts and observations are jointly Normally distributed.
+In particular, we assume that the observation $y_t$ and the vector of forecasts $\vec{x}_t = (x^{(1)}_t, \dots, x^{(M)}_t)'$ at time $t$ are jointly drawn from a multivariate Normal distribution with fixed parameters:
 %
 \begin{equation}
-\left[\begin{matrix}y_t\\ \vec{x}_t\end{matrix} \right] \sim \mathcal{N}\left( \left[\begin{matrix}\mu_y \\ \vec{\mu}_x \end{matrix}\right], \left[ \begin{matrix}\Sigma_{yy} & \mat{\Sigma}_{yx} \\ \mat{\Sigma}_{xy} & \mat{\Sigma}_{xx} \end{matrix} \right]  \right)
+\left[\begin{matrix}y_t\\ \vec{x}_t\end{matrix} \right] \sim \mathcal{N}\left( \left[\begin{matrix}\mu_y \\ \vec{\mu}_x \end{matrix}\right], \left[ \begin{matrix}\Sigma_{yy} & \mat{\Sigma}_{yx} \\ \mat{\Sigma}_{xy} & \mat{\Sigma}_{xx} \end{matrix} \right]  \right).
 \label{eq:jointdist}
 \end{equation}
 %
-then the conditional distribution of the observation, given a values of the ensembles $\vec{m}_t$ is given by
+Draws at different times are assumed to be independent.
+Any biases in mean and scale, and varying levels of correlation between forecasts and observations are encoded in the paramters $\mu$ and $\Sigma$ of the joint Normal distribution.
+These parametric assumptions allow us to derive the optimal post-processing of ensemble means into a prediction for the observation.
+
+
+Under the assumption of joint Normality, the conditional distribution of the observation, given specific values of the forecasts $\vec{x} = \vec{m}_t = (m_t^{(1)}, \dots, m_t^{(M)})'$, is a Normal distribution
 %
 \begin{equation}
-p(y_t | \vec{x}_t = \vec{m}_t) = \mathcal{N}(\mu_{y|x}, \Sigma_{y|x})
+p(y_t | \vec{x}_t = \vec{m}_t) = \mathcal{N}(\mu_{y|x}(\vec{m}_t), \Sigma_{y|x})
 \label{eq:regrlemma}
 \end{equation}
 %
-where
+with conditional mean $\mu_{y|x}$ and conditional variance $\Sigma_{y|x}$ given by
 %
 \begin{align}
-\mu_{y|x} & = \mu_{y} + \mat{\Sigma}_{yx} \mat{\Sigma}_{xx}^{-1} (\vec{m}_t - \vec{\vec{\mu}}_x)\\
+\mu_{y|x}(\vec{m}_t) & = \mu_{y} + \mat{\Sigma}_{yx} \mat{\Sigma}_{xx}^{-1} (\vec{m}_t - \vec{\vec{\mu}}_x)\label{eq:cond_mean}\\
 \Sigma_{y|x} & = \Sigma_{yy} - \mat{\Sigma}_{yx} \mat{\Sigma}_{xx}^{-1} \mat{\Sigma}_{xy}
 \end{align}
 %
-(c.f. Mardia et al). 
-Therefore, the optimal weighting scheme of the $M$ ensemble means is the multiple regression given by
+(c.f. Mardia et al 1995 ch 3). 
+From eq. \ref{eq:cond_mean} it follows that the optimal combination of the $M$ forecasts $(m_t^{(1)},\dots,m_t^{(M)})$ into a single prediction $\hat{y}_t$ for the observation, is given by the linear function
 \begin{equation}
 \hat{y}_t = a + \sum_{m=1}^M w_m x^{(m)}_t
+\label{eq:y_hat}
 \end{equation}
 %
 where
 %
 \begin{align}
-a & = \mu_y - \mat{\Sigma}_{yx} \mat{\Sigma}_{xx}^{-1} \vec{\mu}_x\\
-w_m & = \mat{\Sigma}_{yx}(\mat{\Sigma}_{xx}^{-1})_{m}
+a & = \mu_y - \mat{\Sigma}_{yx} \mat{\Sigma}_{xx}^{-1} \vec{\mu}_x\label{eq:a}\\
+w_m & = \mat{\Sigma}_{yx}(\mat{\Sigma}_{xx}^{-1})_{m}\label{eq:wm}.
 \end{align}
 %
-Assuming the sample means, variances, and correlations above are the correct values, the overall mean $s$, weights $w_m$, and residual variance $\Sigma_{y|x}$ for ENSO are given by
-%
-\begin{verbatim}
-     a  w_cfs  w_cmc w_gfdl   w_mf w_nasa   w_ec      v 
- -4.07  -0.10   0.33   0.17   0.66  -0.16   0.28   0.19 
-\end{verbatim}
-%
-and the values for NAO are
-%
-\begin{verbatim}
-       a  w_ecmwf  w_lodyn  w_metfr    w_mpi   w_ukmo        v 
--0.36920 -0.00127  0.00074  0.00190  0.00038 -0.00141  1.57664 
-\end{verbatim}
+Here $(\mat{\Sigma}_{xx}^{-1})_m$ denotes the $m$th column of the inverse of $\mat{\Sigma}_{xx}$.
+Eq. \ref{eq:wm} shows that the weight of forecast $m$ in the combined prediction depends on the covariances of all forecasts with the observations, as well as the covariances of forecast $m$ with all the other forecasts.
 
-The weights become more interpretable by performing a scale free analysis, i.e., by normalising the observations and time series of ensemble means.
-Then the weights for ENSO and NAO are given by
-\begin{verbatim}
-ENSO:
-   a  w_cfs  w_cmc w_gfdl   w_mf w_nasa   w_ec      v 
-0.00  -0.12   0.43   0.18   0.37  -0.16   0.28   0.13 
-NAO:
-    a w_ecmwf w_lodyn w_metfr   w_mpi  w_ukmo       v 
-0.000  -0.130   0.063   0.219   0.029  -0.139   0.929 
-\end{verbatim}
 
-Given the above correlation structures, what would be the optimal post-processing scheme of the multi-model mean (MMM)?
-If the vector $\vec{x}$ is a random variable $\vec{x}\sim \mathcal{N}(\vec{\mu}, \mat{\Sigma})$ then the random variable $\mat{A}\vec{x} \sim \mathcal{N}(\mat{A}\vec{\mu}, \mat{A}\mat{\Sigma}\mat{A}')$.
-Setting
+
+In general the parameters of the Normal distribution are unknown, and have to be estimated from available tuples of past forecasts and observations.
+We will look into the problem of parameter estimation later.
+For the moment, we assume that the parameters $\vec{\mu}$ and $\mat{\Sigma}$ are known exactly.
+Plugging in these values into equations \ref{eq:a} and \ref{eq:wm} then yields the overall mean $a$, the post-processing weights $w_m$, and the residual variance $\Sigma_{y|x}$. 
+If we assume that the mean and covariance of the joint distribution of forecasts and observations are equal to the sample means and covariances of the ENSO data, we get
+
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+     $a$  &$w_{\mathrm{cfs}}$  &$w_{\mathrm{cmc}}$ &$w_{\mathrm{gfdl}}$   &$w_{\mathrm{mf}}$ &$w_{\mathrm{nasa}}$   &$w_{\mathrm{ec}}$      &$\Sigma_{y|x}$ \\
+ -4.07  &-0.10   &0.33   &0.17   &0.66  &-0.16   &0.28   &0.19 
+\end{tabular}
+\end{center}
+
+and if we plugin the sample means and covariances of the NAO data, we get
+
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+       $a$  &$w_{\mathrm{ecmwf}}$  &w$_{\mathrm{lodyn}}$  &w$_{\mathrm{metfr}}$    &w$_{\mathrm{mpi}}$   &w$_{\mathrm{ukmo}}$        &$\Sigma_{y|x}$ \\
+-0.37 & -1.27  & 0.74  & 1.90  & 0.38 & -1.41  & 1.58
+\end{tabular}
+\end{center}
+
+
+For simplicity, it is often preferred to combine models from different forecast centres by a democratic vote, where each model gets the same weight in the combination.
+Such an equal-weights post-processingn scheme is equivalent to post-processing the multi-model mean (MMM), by first combining all forecasts into the MMM, and then fitting the observation to the MMM by linear regression.
+
+
+Given the above correlation structures, what would be the optimal post-processing scheme for the multi-model mean (MMM), i.e., for post-processing with equal weights?
+We use the well-known result from Normal theory: If the vector $\vec{x}$ is a random variable $\vec{x}\sim \mathcal{N}(\vec{\mu}, \mat{\Sigma})$ then the linear transformation $\mat{A}\vec{x} \sim \mathcal{N}(\mat{A}\vec{\mu}, \mat{A}\mat{\Sigma}\mat{A}')$.
+We still assume the multivariate Normal structure of eq. \ref{eq:jointdist}.
+To combine the individual forecasts into the MMM, we set
 %
 \begin{equation}
 \mat{A} = \left(\begin{matrix} 1 & 0 & \dots & 0 \\ 0 & \frac1M & \dots & \frac1M\end{matrix}\right)
 \end{equation}
 %
-yields the joint distribution of the observation and the MMM from which the forecast distribution $p(y_t | \bar{x}_t = m_t)$ can be derived using eq.~\ref{eq:regrlemma}:
+We can calculate the joint distribution of the observation and the MMM. 
+From the joint distribution, we obtain the forecast distribution $p(y_t | \bar{x}_t = m_t)$ using eq.~\ref{eq:regrlemma}:
 %
 \begin{equation}
 p(y_t|\bar{x}_t = \bar{m}_t) = \mathcal{N}\left(\mu_y + \frac{\Sigma_{y\bar{x}}}{\Sigma_{\bar{x}\bar{x}}} (\bar{m}_t - \mu_{\bar{x}}), \Sigma_{yy} - \frac{\Sigma_{\bar{x}y}^2}{\Sigma_{\bar{x}\bar{x}}}\right)
 \end{equation}
 %
-where $\Sigma_{y\bar{x}}$, $\Sigma_{\bar{x}\bar{x}}$ and $\mu_{\bar{x}}$ are given by ... (fill in details here).
-
-We can now ask what is the potential benefit of using unequal weighting vs equal weighting for MMEs with a known correlation structure.
-We consider the expected squared difference between forecast mean and observation, as well as the expected Ignorance score, and the expected CRPS of the forecast distribution.
-We calculate these measures for the optimally weighted forecasts, for the equally-weighted forecasts and for the climatological forecast (where all weights are zero).
-
-If the observations and ensemble means are multivariate Normal, the climatological distribution is simply the marginal distribution of the observation
-%
-\begin{equation}
-p_{clim}(y_t) \sim \mathcal{N}(\mu_y, \Sigma_{yy})
-\end{equation}
-%
-The expected mean squared error of this forecast is simply
-%
-\begin{equation}
-E[(y - \mu_y)^2] = \Sigma_{yy}
-\end{equation}
-%
-The expected Ignorance score of the climatological distribution is equal to
+where $\Sigma_{y\bar{x}}$, $\Sigma_{\bar{x}\bar{x}}$ and $\mu_{\bar{x}}$ are given by 
 %
 \begin{align}
-E[-\log(p_{clim}(y))] & = \log \sqrt{2\pi \Sigma_{yy}} + \frac12 \frac{E[(y-\mu_y)^2]}{\Sigma_{yy}}\\
-& = \frac12 \left(\log 2\pi + \frac12 \log\Sigma_{yy} + 1\right)
+\mu_{\bar{x}} & = \frac1M \sum_{m=1}^M \vec{\mu}_x^{(m)}\\
+\Sigma_{\bar{x}\bar{x}} & = \frac{1}{M^2}\sum_{m=1}^M\sum_{m'=1}^M \mat{\Sigma}_{xx}^{(m,m')} \\
+\Sigma_{y\bar{x}} & = \frac1M \sum_{m=1}^M \mat{\Sigma}_{xy}^{(m)}
 \end{align}
 %
-i.e., the entropy of the climatological distribution.
-The expected CRPS of the climatological distribution is equal to 
+Post-processing with equal weights is a simple linear regression with parameters $a$, $w_{MMM}$ and $\Sigma_{y|x}$ as in eq. \ref{eq:y_hat}.
+Assuming the ENSO and NAO correlation structures, we get the following equal-weighting post-processing parameters 
+%
+\begin{center}
+\begin{tabular}{c|ccc}
+& $a$ & $w_{\mathrm{MMM}}$ & $\Sigma_{y|x}$ \\
+\hline
+\textbf{ENSO} & $2.32$ & $0.95$ & $0.24$ \\
+\textbf{NAO} & $0.34$ & $0.34$ & $1.70$ 
+\end{tabular}
+\end{center}
+
+Lastly, we consider the trivial post-processing scheme where the forecast model values are ignored, and a climatological forecast is made for the observation.
+The climatological forecast is equivalent to a post-processing with zero weights, i.e.
+
 \begin{align}
-E[crps(\mathcal{N}(\mu_y, \Sigma_{yy}), y)] = \sqrt{\frac{\Sigma_{yy}}{\pi}}
+\mu_{y|x} & = \mu_y\\
+\Sigma_{y|x} & = \Sigma_{yy}
+\end{align}
+
+
+
+We consider the questions what is the potential benefit of using unequal weighting vs equal weighting for MMEs with a known correlation structure.
+To address this, we calculate expected verification scores, in particular the expected squared error of the forecast mean (SQERR), the continuous ranked probability score (CRPS) and the logarithmic score (LOGS).
+The corresponding equations are
+%
+\begin{align}
+SQERR(\mathcal{N}(\mu_{y|x},\Sigma_{y|x}),y) & = (\mu_{y|x} - y)^2\\
+CRPS(\mathcal{N}(\mu_{y|x},\Sigma_{y|x}),y) & = \sigma_{y|x}(2\varphi(z)+z(2\Phi(z)-1)-\pi^{-\frac12})\\
+LOGS(\mathcal{N}(\mu_{y|x},\Sigma_{y|x}),y) & = \frac12(\log2\pi + \log\Sigma_{y|x} + z^2)
 \end{align}
 %
-which follows from integration by parts.
-Note that, for the climatological Normal distribution, the RMSE and the CRPS are related by a multiplicative factor of $\sqrt{\pi}$.
+where $\sigma_{y|x} = \sqrt{\Sigma_{y|x}}$, $z=(y - \mu_{y|x})/\sigma_{y|x}$, and $\varphi$ and $\Phi$ are the pdf and cdf of the standard Normal distribution.
+The expectations of the above scores can be calculated analytically under the joint Normal assumption.
 
-In fact, the expectation of $crps(y,\mathcal{N(\mu,\sigma^2)})$, where $y\sim\mathcal{N}(\mu,\sigma^2)$ is always equal to $\sqrt{\sigma^2/\pi}$, independent of the values of $\mu$ and $\sigma$.
-Therefore, the expected CRPS of the conditional forecast distribution in a multivariate Normal setting is always equal to $\sqrt{\Sigma_{y|x}/\pi}$.
 
-The expected MSE of the conditional forecast distribution is given by 
-\begin{equation}
-E[(y - \mu_y - \Sigma_{yx}\Sigma_{xx}^{-1}(x - \mu_x))^2] = \Sigma_{y|x}
-\end{equation}
-
-The expected Ignorance score is given by
-\begin{equation}
-E[-\log p_{y|x}(y)] = \frac12 (\log 2\pi + \log\Sigma_{y|x} + 1).
-\end{equation}
-
-The respective values for the ENSO and NAO correlation structures are:
-
-\begin{verbatim}
-ENSO
-         mse crps  ign
-clim    1.51 0.69 1.63
-equal   0.24 0.28 0.71
-unequal 0.19 0.25 0.59
-
-NAO
-           mse    crps    ign
-clim    1.9636 0.79058 1.7563
-equal   1.9630 0.79046 1.7562
-unequal 1.8244 0.76205 1.7196
-\end{verbatim}
-
-For both ENSO and NAO, the unequal weighting performs better than equal weighting.
-This result is expected. 
-Since the unequal weighting scheme was based on knowledge of the full joint distribution of the data, it uses the most complete knowledge that we can possibly have about the observation given the forecasts.
-On the other hand, the equal weighting scheme assumes a simplified covariance structure and is therefore based on imcomplete information.  
-
-The analysis also shows the magnitude of improvements we might hope to achieve by using unequal weighting.
-This improvement can be quantified by relative scores (or skill scores):
+In all three post-processing scenarios (climatology, equal weights, unequal weights), the observation $y_t$ is assumed to have a Normal distribution $\mathcal{N}(\mu, \sigma^2)$, with constant variance, and a mean that is either constant (climatological forecast) or depends on the value of the forecasts (equal and unequal weighting).
+To calculate the expected value of the score $S(\mathcal{N}(\mu,\sigma^2),y)$, we use conditional expectations:
 %
 \begin{equation}
-Skill = \frac{S_{clim} - S_{equal}}{S_{clim} - S_{unequal}}
+E_{x,y}S\left[\mathcal{N}(\mu_{y|x},\Sigma_{y|x}),y\right] = E_x\left[ E_{y|x} S\left[\mathcal{N}(\mu_{y|x},\Sigma_{y|x}), y\right]\right]
 \end{equation}
 %
-\begin{verbatim}
-skill scores:
-ENSO
- mse crps  ign 
-0.96 0.93 0.89 
-NAO
-   mse   crps    ign 
-0.0043 0.0042 0.0041 
-\end{verbatim}
+The inner expectation, taken over all possible values of the observation $y$ for a given value of the forecast $x$, is given by
+%
+\begin{align}
+E_{y|x} \mathrm{SQERR} & = \Sigma_{y|x}\label{eq:esqerr}\\
+E_{y|x} \mathrm{CRPS} & = \sqrt{\frac{\Sigma_{y|x}}{\pi}}\label{eq:ecrps}\\
+E_{y|x} \mathrm{LOGS} & = \frac12\left( \log2\pi + \log\Sigma_{y|x} +1\right)\label{eq:elogs}
+\end{align}
+%
+None of these expected scores depend on the particular value of $x$, because the forecast variance is constant in all three forecasting schemes.
+Taking the expectation $E_x$ therefore leaves the expressions in eq. \ref{eq:esqerr}-\ref{eq:elogs} unchanged.
 
-(should state the ignorance difference, not the ratio)
-The relative improvements are vastly different.
+
+The expected score values assuming the ENSO and NAO correlation structures are:
+%
+\begin{center}
+\begin{tabular}{cccc}
+\textbf{ENSO} & SQERR & CRPS  & LOGS\\
+clim    & 1.51 & 0.69 & 1.63\\
+equal   & 0.24 & 0.28 & 0.71\\
+unequal & 0.19 & 0.25 & 0.59\\
+\hline
+\textbf{NAO} & SQERR    & CRPS    & LOGS\\
+clim    & 1.9636 & 0.79058 & 1.7563\\
+equal   & 1.9630 & 0.79046 & 1.7562\\
+unequal & 1.8244 & 0.76205 & 1.7196
+\end{tabular}
+\end{center}
+
+For both ENSO and NAO, the unequal weighting performs better than equal weighting on average.
+This result is expected because the correlations of the different models with the observation are different.
+Since we are working under assumption that all distributional parameters are known exactly, equal weighting leads to a worse forecast than unequal weighting.
+
+The analysis can be used to get a feeling of the magnitudes of improvement that we might hope to get from using the optimal weighting with unequal weights as opposed to using the sub-optimal weighting with equal weights. 
+For ENSO, the improvement of equal weighting over the climatology is very large for all scores, compared to the improvement of unequal weighting over equal weighting.
+For NAO, all improvements in scores are tiny; but the improvement of unequal weighting over equal weighting is much larger than the improvement of equal weighting over the climatological forecast.
+
+The improvements can be quantified by relative scores which we define here as the score differences between equal and unequal weighting, normalised by the score difference between climatological and unequal weighting:
+%
+\begin{equation}
+Skill = \frac{S_{equal} - S_{unequal}}{S_{clim} - S_{unequal}}
+\end{equation}
+%
+The skill scores are given by
+%
+\begin{center}
+\begin{tabular}{c|ccc}
+& SQERR & CRPS &  LOGS \\
+\hline
+\textbf{ENSO} & 0.038 & 0.069 & 0.113 \\
+\textbf{NAO} & 0.9957 & 0.9958 & 0.9959 
+\end{tabular}
+\end{center}
+
+The relative improvements are vastly different between ENSO and NAO.
 For ENSO, the scores achieved by equal weighting is relatively close the scores achieved by unequal weighting, but for NAO the equal weighting scores are (relatively) rarely better than the climatological scores.
+The behavior of the different scores is similar: The log score indicates the biggest expected relative improvement of unequal weighting over equal weighting, and the squared error the smallest.
 
-However, in general we do not know the population parameters exactly, as was assumed in all the analyses above.
+
+The above analysis was based on highly idealised assumptions.
+In general we do not know the parameters of the joint distribution of forecasts and observations exactly.
 In general all we have is a finite sample of forecasts and observations.
 We can make an assumption of joint Normality and independence and estimate the parameters.
 In this case, the quality of our post-processed forecasts will also be affected by random errors due to the finiteness of the data set that is used for estimating the parameters.
 
-\section{Skill degradation due to parameter estimation errors}
+\section{Equal vs unequal weighting based on finite training data}
+
+
+\begin{figure}
+\centering
+\includegraphics[width=.7\textwidth, page=9]{../R/n-dependence.pdf}
+\caption{Illustration of the random number experiment. The black and gray solid lines to the left of the dashed lines are ensemble means and observations in the training data set. These data are used to estimate the post-processing weights. A single set of forecasts is produced out of sample (open circles to the right of the dashed line), and post-processed into a predictive distribution function, using the parameters estimated from the training data set. This forecast distribution is compared with the out-of-sample verifying observation (gray square) using the squared error, the CRPS, and the Log score.}
+\end{figure}
+
+
+We set up a random number experiment to study the effect of finite hindcast size on how well the post-processing weights can be estimated.
+We fix parameters $\vec{\mu}$ and $\mat{\Sigma}$ of a multivariate Normal distribution, from which we draw independent samples that represent forecasts and observations.
+We draw a training data set of size $n$, representing $n$ time samples of forecasts and observations.
+From the training data set, we estimate the mean vector $\hat{\vec{\mu}}$ and covariance matrix $\hat{\mat{\Sigma}}$ which we use to calculate the weights to post-process future forecasts.
+Then we draw one more sample from the same multivariate distribution as a test case, i.e., we get one additional set of forecasts $\vec{x}_{n+1}$ and a single verifying observation $y_{n+1}$.
+We use the post-processing parameters $\hat{\vec{\mu}}$ and $\hat{\mat{\Sigma}}$ to transform the forecasts $\vec{x}_{n+1}$ into a predictive distribution for the observation $y_{n+1}$, using eq \ref{eq:???} for unequal weighting, and eq. \ref{eq:???} for equal weighting.
+The forecast is evaluated by the squared error of the mean, the logarithmic score and the CRPS.
+For every setting of $\vec{\mu}$, $\mat{\Sigma}$, and $n$, this procedure is repeated $10^6$ times, resulting in a collection of $10^6$ values of verification scores, that evaluate the of out-of-sample predictions.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=.6\textwidth, page=3]{../R/n-dependence.pdf}\\
+\includegraphics[width=.6\textwidth, page=6]{../R/n-dependence.pdf}
+\end{center}
+\caption{Test}
+\label{fig:se_vs_n}
+\end{figure}
+
+Figure \ref{fig:se_vs_n} shows how the mean and standard deviation of the squared prediction error behaves as a function of the training sample size $n$.
+To set the parameters $\vec{\mu}$ and $\mat{\Sigma}$ we used the sample values calculated for the NAO and ENSO seasonal prediction data sets.
+The standard deviations are calculated over all out-of-sample predictions to indicate the range of score values that can be expected for any given forecast.
+We note the following:
+%
+\begin{enumerate}
+\item For small sample sizes, the expected squared error of the forecast mean is smaller if we use equal weights than if we use unequal weights.
+For the ENSO setting, equal weighting is better if the training sample size $n\le30$, and for the NAO setting, equal weighting is better on average if $n\le 60$.
+\item For large training sample sizes, unequal weighting outperforms equal weighting on average. But the magnitude of the improvement is very small compared to the total variability of verification scores.
+\item The above points are true for the logarithmic score and CRPS as well.
+\end{enumerate}
+
+
+The above observations raise a number of questions:
+\begin{enumerate}
+\item Given the small number of hindcast samples that we normally have for seasonal predictions, should we always use equal weighting instead of unequal weighting?
+
+\item Given the small effect that we can expect from unequal weighting, is it worthwhile to pursue this form of post-processing at all?
+
+\item Given the large variability of values of the verification score, how likely are we to improve the forecasts by unequal weighting on any particular forecast instance?
+\end{enumerate}
+
+The first two questions are subjective and have to judged on a case by case basis, perhaps using simulation studies as we did above.
+The third question can be answered for our simulation study.
+For each foreacst instance, we get two post-processed forecasts for the same observation, one based on equal weighting and one based on unequal weighting.
+Each forecast obtains a certain value of the verification score.
+On any particular forecast instance, equal weighting is either better or worse than unequal weighting.
+We can now ask the questions ``On what fraction of forecast instances does unequal weighting produce a better forecast than equal weighting''?
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=.7\textwidth, page=7]{../R/n-dependence.pdf}\\
+\includegraphics[width=.7\textwidth, page=8]{../R/n-dependence.pdf}\\
+\end{center}
+\caption{}
+\label{fig:prob_impr}
+\end{figure}
+
+In Figure \ref{fig:prob_impr}, the fraction of cases where unequal weighting produces a better forecast than equal weighting is shown as a function of the training sample size $n$.
+We find that for small sample sizes, equal weighting is more likely than not to produce a better forecast than unequal weighting.
+For larger sample sizes, unequal weighting becomes more likely to perform better.
+But even for large training sample sizes, there is still a considerable number of cases, where equal weighting outperforms unequal weighting.
+Furthermore, the 3 scoring rules considered behave rather differently.
+The logarithmic score is much more likely to show an improved forecast due to unequal weightingthan the other two scores.
+The mean squared error is least likely to indicate an improvement of unequal over equal weighting.
 
 
 

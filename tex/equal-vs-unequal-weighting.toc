@@ -1,6 +1,5 @@
 \contentsline {section}{\numberline {1}Introduction}{1}
 \contentsline {subsection}{\numberline {1.1}Literature}{2}
 \contentsline {section}{\numberline {2}Seasonal forecast data: El Nino Southern Oscillation and the North Atlantic Oscillation}{2}
-\contentsline {subsection}{\numberline {2.1}Summary statistics}{2}
-\contentsline {section}{\numberline {3}Optimal weighting by multivariate analysis}{4}
-\contentsline {section}{\numberline {4}Skill degradation due to parameter estimation errors}{9}
+\contentsline {section}{\numberline {3}Optimal combination by multivariate analysis}{4}
+\contentsline {section}{\numberline {4}Equal vs unequal weighting based on finite training data}{8}

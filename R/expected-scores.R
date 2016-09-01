@@ -1,3 +1,6 @@
+# the function return expected MSE, expected CRPS and expected log score for a
+# covariance matrix whose first column corresponds to the observation, and the
+# remaining columns correspond to difference forecasting systems
 expected_scores = function(Sigma) {
   Sigma = as.matrix(Sigma)
   if (ncol(Sigma)==1) {
@@ -8,6 +11,9 @@ expected_scores = function(Sigma) {
   return(c(mse=s_yx, crps=sqrt(s_yx/pi), ign=.5*(log(2*pi)+log(s_yx)+1)))
 }
 
+
+###############################################################
+# ENSO analysis
 load('../data/enso-nao.Rdata')
 n_enso = nrow(enso)
 p_enso = ncol(enso)
@@ -28,6 +34,9 @@ cat('ENSO\n')
 print(scores_enso, digits=2)
 cat('\n')
 
+
+###############################################################
+# NAO analysis
 n_nao = nrow(nao)
 p_nao = ncol(nao)
 M_nao = p_nao - 1
@@ -48,11 +57,13 @@ print(scores_nao, digits=5)
 cat('\n')
 
 
+###############################################################
+# skill scores
 cat('\n')
 cat('skill scores:\n\n')
 cat('ENSO\n')
-print((scores_enso[1,]-scores_enso[2,])/(scores_enso[1,]-scores_enso[3,]), digits=2)
+print((scores_enso['equal',]-scores_enso['unequal',])/(scores_enso['clim',]-scores_enso['unequal',]), digits=2)
 cat('\n')
 cat('NAO\n')
-print((scores_nao[1,]-scores_nao[2,])/(scores_nao[1,]-scores_nao[3,]), digits=2)
+print((scores_nao['equal',]-scores_nao['unequal',])/(scores_nao['clim',]-scores_nao['unequal',]), digits=5)
 
