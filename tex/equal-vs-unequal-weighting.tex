@@ -250,20 +250,20 @@ and if we plugin the sample means and covariances of the NAO data, we get
 
 
 For simplicity, it is often preferred to combine models from different forecast centres by a democratic vote, where each model gets the same weight in the combination.
-Such an equal-weights post-processingn scheme is equivalent to post-processing the multi-model mean (MMM), by first combining all forecasts into the MMM, and then fitting the observation to the MMM by linear regression.
+Such an equal-weights post-processingn scheme is equivalent to post-processing the multi-model mean (MMM); we combining all forecasts into the MMM first, and then fit the observation to the MMM by linear regression.
 
 
-Given the above correlation structures, what would be the optimal post-processing scheme for the multi-model mean (MMM), i.e., for post-processing with equal weights?
-We use the well-known result from Normal theory: If the vector $\vec{x}$ is a random variable $\vec{x}\sim \mathcal{N}(\vec{\mu}, \mat{\Sigma})$ then the linear transformation $\mat{A}\vec{x} \sim \mathcal{N}(\mat{A}\vec{\mu}, \mat{A}\mat{\Sigma}\mat{A}')$.
-We still assume the multivariate Normal structure of eq. \ref{eq:jointdist}.
+Given the multivariate Normal distribution of forecasts and observations (eq. \ref{eq:jointdist}), what is the optimal post-processing scheme for the multi-model mean (MMM), i.e., for equal-weights post-processing?
+We use the following well-known result from Normal theory: If the vector $\vec{x}$ is a random variable $\vec{x}\sim \mathcal{N}(\vec{\mu}, \mat{\Sigma})$ then the linear form $\mat{A}\vec{x} \sim \mathcal{N}(\mat{A}\vec{\mu}, \mat{A}\mat{\Sigma}\mat{A}')$.
 To combine the individual forecasts into the MMM, we set
 %
 \begin{equation}
-\mat{A} = \left(\begin{matrix} 1 & 0 & \dots & 0 \\ 0 & \frac1M & \dots & \frac1M\end{matrix}\right)
+\mat{A} = \left(\begin{matrix} 1 & 0 & \dots & 0 \\ 0 & \frac1M & \dots & \frac1M\end{matrix}\right),
 \end{equation}
 %
-We can calculate the joint distribution of the observation and the MMM. 
-From the joint distribution, we obtain the forecast distribution $p(y_t | \bar{x}_t = m_t)$ using eq.~\ref{eq:regrlemma}:
+which transforms the vector of observations and forecasts into the 2-vector of observation and MMM.
+We can then calculate the joint distribution of the observation and the MMM. 
+From this joint distribution, we obtain the forecast distribution for the observation given the MMM, i.e., $p(y_t | \bar{x}_t = m_t)$, using eq.~\ref{eq:regrlemma}:
 %
 \begin{equation}
 p(y_t|\bar{x}_t = \bar{m}_t) = \mathcal{N}\left(\mu_y + \frac{\Sigma_{y\bar{x}}}{\Sigma_{\bar{x}\bar{x}}} (\bar{m}_t - \mu_{\bar{x}}), \Sigma_{yy} - \frac{\Sigma_{\bar{x}y}^2}{\Sigma_{\bar{x}\bar{x}}}\right)
@@ -274,7 +274,7 @@ where $\Sigma_{y\bar{x}}$, $\Sigma_{\bar{x}\bar{x}}$ and $\mu_{\bar{x}}$ are giv
 \begin{align}
 \mu_{\bar{x}} & = \frac1M \sum_{m=1}^M \vec{\mu}_x^{(m)}\\
 \Sigma_{\bar{x}\bar{x}} & = \frac{1}{M^2}\sum_{m=1}^M\sum_{m'=1}^M \mat{\Sigma}_{xx}^{(m,m')} \\
-\Sigma_{y\bar{x}} & = \frac1M \sum_{m=1}^M \mat{\Sigma}_{xy}^{(m)}
+\Sigma_{y\bar{x}} & = \frac1M \sum_{m=1}^M \mat{\Sigma}_{yx}^{(m)}
 \end{align}
 %
 Post-processing with equal weights is a simple linear regression with parameters $a$, $w_{MMM}$ and $\Sigma_{y|x}$ as in eq. \ref{eq:y_hat}.
@@ -289,9 +289,9 @@ Assuming the ENSO and NAO correlation structures, we get the following equal-wei
 \end{tabular}
 \end{center}
 
-Lastly, we consider the trivial post-processing scheme where the forecast model values are ignored, and a climatological forecast is made for the observation.
+For reference, we also consider the trivial post-processing scheme where the forecasts are ignored, and a climatological forecast is made for the observation.
 The climatological forecast is equivalent to a post-processing with zero weights, i.e.
-
+%
 \begin{align}
 \mu_{y|x} & = \mu_y\\
 \Sigma_{y|x} & = \Sigma_{yy}
@@ -301,19 +301,20 @@ The climatological forecast is equivalent to a post-processing with zero weights
 
 We consider the questions what is the potential benefit of using unequal weighting vs equal weighting for MMEs with a known correlation structure.
 To address this, we calculate expected verification scores, in particular the expected squared error of the forecast mean (SQERR), the continuous ranked probability score (CRPS) and the logarithmic score (LOGS).
-The corresponding equations are
+The corresponding equations for Normal forecast distributions are
 %
 \begin{align}
-SQERR(\mathcal{N}(\mu_{y|x},\Sigma_{y|x}),y) & = (\mu_{y|x} - y)^2\\
-CRPS(\mathcal{N}(\mu_{y|x},\Sigma_{y|x}),y) & = \sigma_{y|x}(2\varphi(z)+z(2\Phi(z)-1)-\pi^{-\frac12})\\
-LOGS(\mathcal{N}(\mu_{y|x},\Sigma_{y|x}),y) & = \frac12(\log2\pi + \log\Sigma_{y|x} + z^2)
+SQERR(\mathcal{N}(\mu_{y|x},\Sigma_{y|x}),y) & = (\mu_{y|x} - y)^2\label{eq:normal_sqerr}\\
+CRPS(\mathcal{N}(\mu_{y|x},\Sigma_{y|x}),y) & = \sigma_{y|x}(2\varphi(z)+z(2\Phi(z)-1)-\pi^{-\frac12})\label{eq:normal_crps}\\
+LOGS(\mathcal{N}(\mu_{y|x},\Sigma_{y|x}),y) & = \frac12(\log2\pi + \log\Sigma_{y|x} + z^2)\label{eq:normal_logs}
 \end{align}
 %
 where $\sigma_{y|x} = \sqrt{\Sigma_{y|x}}$, $z=(y - \mu_{y|x})/\sigma_{y|x}$, and $\varphi$ and $\Phi$ are the pdf and cdf of the standard Normal distribution.
+Eq. \ref{eq:normal_sqerr} is trivial, eq. \ref{eq:normal_crps} was given in \cite{gneiting2007} and eq. \ref{eq:normal_logs} follows from the distribution law of the Normal distribution.
 The expectations of the above scores can be calculated analytically under the joint Normal assumption.
 
 
-In all three post-processing scenarios (climatology, equal weights, unequal weights), the observation $y_t$ is assumed to have a Normal distribution $\mathcal{N}(\mu, \sigma^2)$, with constant variance, and a mean that is either constant (climatological forecast) or depends on the value of the forecasts (equal and unequal weighting).
+In all three post-processing scenarios (climatology, equal weights, unequal weights), the observation $y_t$ is assumed to have a Normal distribution $\mathcal{N}(\mu, \sigma^2)$, with constant forecast variance $\Sigma_{y|x}$, and a forecast mean $\mu_{y|x}$ that is either constant (climatological forecast) or depends on the values of the model forecasts (equal and unequal weighting).
 To calculate the expected value of the score $S(\mathcal{N}(\mu,\sigma^2),y)$, we use conditional expectations:
 %
 \begin{equation}
@@ -348,21 +349,22 @@ unequal & 1.8244 & 0.76205 & 1.7196
 \end{tabular}
 \end{center}
 
-For both ENSO and NAO, the unequal weighting performs better than equal weighting on average.
-This result is expected because the correlations of the different models with the observation are different.
-Since we are working under assumption that all distributional parameters are known exactly, equal weighting leads to a worse forecast than unequal weighting.
+For both settings, the unequal weighting performs better than equal weighting on average.
+This result is expected because the correlations of the different models with the observation are different, and so the weights assigned to different forecasts should be different.
+Since we are working under the assumption that all distributional parameters are known exactly, equal weighting leads to a worse forecast than unequal weighting.
 
-The analysis can be used to get a feeling of the magnitudes of improvement that we might hope to get from using the optimal weighting with unequal weights as opposed to using the sub-optimal weighting with equal weights. 
+
+The analysis illustrates the magnitudes of the potential improvement that we might get from using the optimal weighting with unequal weights as opposed to using the (sub-optimal) weighting with equal weights. 
 For ENSO, the improvement of equal weighting over the climatology is very large for all scores, compared to the improvement of unequal weighting over equal weighting.
-For NAO, all improvements in scores are tiny; but the improvement of unequal weighting over equal weighting is much larger than the improvement of equal weighting over the climatological forecast.
+For NAO, all score improvements are tiny; but the improvement of unequal weighting over equal weighting is much larger than the improvement of equal weighting over the climatological forecast.
 
-The improvements can be quantified by relative scores which we define here as the score differences between equal and unequal weighting, normalised by the score difference between climatological and unequal weighting:
+The improvements can be quantified by relative scores (skill scores) which we define here as the score differences between equal and unequal weighting, normalised by the score difference between climatological and unequal weighting:
 %
 \begin{equation}
-Skill = \frac{S_{equal} - S_{unequal}}{S_{clim} - S_{unequal}}
+S_{rel} = \frac{S_{equal} - S_{unequal}}{S_{clim} - S_{unequal}}
 \end{equation}
 %
-The skill scores are given by
+The relative scores are given by
 %
 \begin{center}
 \begin{tabular}{c|ccc}
@@ -375,7 +377,7 @@ The skill scores are given by
 
 The relative improvements are vastly different between ENSO and NAO.
 For ENSO, the scores achieved by equal weighting is relatively close the scores achieved by unequal weighting, but for NAO the equal weighting scores are (relatively) rarely better than the climatological scores.
-The behavior of the different scores is similar: The log score indicates the biggest expected relative improvement of unequal weighting over equal weighting, and the squared error the smallest.
+The behavior of the different scores is similar for ENSO and NAO: The log score indicates the biggest relative improvement of unequal weighting over equal weighting, and the squared error the smallest.
 
 
 The above analysis was based on highly idealised assumptions.
@@ -389,77 +391,93 @@ In this case, the quality of our post-processed forecasts will also be affected 
 
 \begin{figure}
 \centering
-\includegraphics[width=.7\textwidth, page=9]{../R/n-dependence.pdf}
+\includegraphics[width=.7\textwidth, page=15]{../R/n-dependence.pdf}
 \caption{Illustration of the random number experiment. The black and gray solid lines to the left of the dashed lines are ensemble means and observations in the training data set. These data are used to estimate the post-processing weights. A single set of forecasts is produced out of sample (open circles to the right of the dashed line), and post-processed into a predictive distribution function, using the parameters estimated from the training data set. This forecast distribution is compared with the out-of-sample verifying observation (gray square) using the squared error, the CRPS, and the Log score.}
+\label{fig:illu}
 \end{figure}
 
 
-We set up a random number experiment to study the effect of finite hindcast size on how well the post-processing weights can be estimated.
-We fix parameters $\vec{\mu}$ and $\mat{\Sigma}$ of a multivariate Normal distribution, from which we draw independent samples that represent forecasts and observations.
-We draw a training data set of size $n$, representing $n$ time samples of forecasts and observations.
-From the training data set, we estimate the mean vector $\hat{\vec{\mu}}$ and covariance matrix $\hat{\mat{\Sigma}}$ which we use to calculate the weights to post-process future forecasts.
-Then we draw one more sample from the same multivariate distribution as a test case, i.e., we get one additional set of forecasts $\vec{x}_{n+1}$ and a single verifying observation $y_{n+1}$.
-We use the post-processing parameters $\hat{\vec{\mu}}$ and $\hat{\mat{\Sigma}}$ to transform the forecasts $\vec{x}_{n+1}$ into a predictive distribution for the observation $y_{n+1}$, using eq \ref{eq:???} for unequal weighting, and eq. \ref{eq:???} for equal weighting.
-The forecast is evaluated by the squared error of the mean, the logarithmic score and the CRPS.
-For every setting of $\vec{\mu}$, $\mat{\Sigma}$, and $n$, this procedure is repeated $10^6$ times, resulting in a collection of $10^6$ values of verification scores, that evaluate the of out-of-sample predictions.
+In this section, we perform random number experiments to study the effect of the finite hindcast size $n$ on how well the post-processing weights can be estimated, and how well the post-processed forecasts perform at predicting future observations.
+We fix parameters $\vec{\mu}$ and $\mat{\Sigma}$ of a multivariate Normal distribution as in eq. \ref{eq:jointdist}, from which we draw $n$ independent samples of forecasts and observations.
+These $n$ samples represent training data from which we wish to estimate post-processing weights.
+We estimate the mean vector $\hat{\vec{\mu}}$ and the covariance matrix $\hat{\mat{\Sigma}}$ which we use to calculate the weights to post-process future forecasts.
+Then we draw one more sample from the same multivariate distribution, which we use as a test case. 
+That is, we get one additional set of forecasts $\vec{x}_{n+1}$ and a single verifying observation $y_{n+1}$.
+We use the post-processing parameters $\hat{\vec{\mu}}$ and $\hat{\mat{\Sigma}}$ to transform the forecasts $\vec{x}_{n+1}$ into a predictive distribution for the observation $y_{n+1}$, using unequal weighting and equal weighting.
+The forecasts are evaluated by the average SQERR, CRPS, and LOGS.
+The random number experiment is illustrated in Fig. \ref{fig:illu}.
+For every setting of $\vec{\mu}$, $\mat{\Sigma}$, and $n$, we repeat the random number experiment $10^6$ times, resulting in a collection of $10^6$ values of verification scores. 
+The average scores are used to evaluate the of out-of-sample predictions of post-processing with equal and unequal weighting.
+
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=.6\textwidth, page=3]{../R/n-dependence.pdf}\\
-\includegraphics[width=.6\textwidth, page=6]{../R/n-dependence.pdf}
+\includegraphics[width=.6\textwidth, page=7]{../R/n-dependence.pdf}\\
+\includegraphics[width=.6\textwidth, page=1]{../R/n-dependence.pdf}
 \end{center}
-\caption{Test}
+\caption{Out-of-sample mean log-scores achieved by post-processing with equal weights, unequal weights, and climatology as a function of the training sample size $n$. The upper panel is for simulated data using the mean and covariance matrix of the ENSO data, and the lower panel is for NAO. The equivalent plots for mean squared error and mean CRPS look similar.}
 \label{fig:se_vs_n}
 \end{figure}
 
-Figure \ref{fig:se_vs_n} shows how the mean and standard deviation of the squared prediction error behaves as a function of the training sample size $n$.
-To set the parameters $\vec{\mu}$ and $\mat{\Sigma}$ we used the sample values calculated for the NAO and ENSO seasonal prediction data sets.
-The standard deviations are calculated over all out-of-sample predictions to indicate the range of score values that can be expected for any given forecast.
+Figure \ref{fig:se_vs_n} shows how the out-of-sample mean log-score behaves as a function of the training sample size $n$.
+To simulate the MME forecast and observation data, we used the parameters $\vec{\mu}$ and $\mat{\Sigma}$ calculated for the NAO and ENSO seasonal prediction data sets.
 We note the following:
 %
 \begin{enumerate}
-\item For small sample sizes, the expected squared error of the forecast mean is smaller if we use equal weights than if we use unequal weights.
-For the ENSO setting, equal weighting is better if the training sample size $n\le30$, and for the NAO setting, equal weighting is better on average if $n\le 60$.
-\item For large training sample sizes, unequal weighting outperforms equal weighting on average. But the magnitude of the improvement is very small compared to the total variability of verification scores.
-\item The above points are true for the logarithmic score and CRPS as well.
+\item For large sample sizes, unequal weighting outperforms climatology and equal weighting on average, as expected.
+\item For small sample sizes, however, the expected score is smaller for post-processing with equal weights than with unequal weights.
+For the ENSO parameters, equal weighting is better if the training sample size $n\le30$, and for the NAO setting, equal weighting is better on average if $n\le 60$.
+\item For the NAO parameters and sample sizes $n \le 20$, unequal weighting is even outperformed by the climatological forecast  
+\item The scores converge to a stable mean value at different rates: Climatology converges fastest, then equal weighting, then unequal weighting.
+\item At large $n$, the magnitude of the improvement of unequal weighting over equal weighting is small compared to the improvement of equal weighting over climatology.
+\item All the above conclusions hold for CRPS and SQERR as well (not shown). 
 \end{enumerate}
 
 
-The above observations raise a number of questions:
+These observations raise a number of questions about how seasonal MME's should be post-processed:
 \begin{enumerate}
-\item Given the small number of hindcast samples that we normally have for seasonal predictions, should we always use equal weighting instead of unequal weighting?
-
-\item Given the small effect that we can expect from unequal weighting, is it worthwhile to pursue this form of post-processing at all?
-
-\item Given the large variability of values of the verification score, how likely are we to improve the forecasts by unequal weighting on any particular forecast instance?
+\item Given the small number of hindcast samples $n$ that we normally have for seasonal predictions, should we always prefer equal weighting over unequal weighting, even if we think that the different models are of different quality?
+\item Given the small effect that we can expect from unequal weighting, is it worthwhile to pursue unequal weighting at all?
+\item Given the large variability of values of the verification score, how likely are we to see an improvement from unequal weighting for a given forecast?
 \end{enumerate}
+
 
 The first two questions are subjective and have to judged on a case by case basis, perhaps using simulation studies as we did above.
 The third question can be answered for our simulation study.
 For each foreacst instance, we get two post-processed forecasts for the same observation, one based on equal weighting and one based on unequal weighting.
 Each forecast obtains a certain value of the verification score.
 On any particular forecast instance, equal weighting is either better or worse than unequal weighting.
-We can now ask the questions ``On what fraction of forecast instances does unequal weighting produce a better forecast than equal weighting''?
+We can now ask the questions ``How often does unequal weighting produce a better forecast than equal weighting''?
 
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=.7\textwidth, page=7]{../R/n-dependence.pdf}\\
-\includegraphics[width=.7\textwidth, page=8]{../R/n-dependence.pdf}\\
+\includegraphics[width=.6\textwidth, page=14]{../R/n-dependence.pdf}\\
+\includegraphics[width=.6\textwidth, page=13]{../R/n-dependence.pdf}\\
 \end{center}
-\caption{}
+\caption{Fraction of cases where the forecast produced with unequal weighting outperforms the forecast produced with equal weighting as a function of the training sample size $n$. Upper panel is for data with ENSO correlation structure, lower panel is for NAO.}
 \label{fig:prob_impr}
 \end{figure}
 
-In Figure \ref{fig:prob_impr}, the fraction of cases where unequal weighting produces a better forecast than equal weighting is shown as a function of the training sample size $n$.
+In Figure \ref{fig:prob_impr}, the fraction of cases where unequal weighting improves upon equal weighting is shown as a function of the training sample size $n$.
 We find that for small sample sizes, equal weighting is more likely than not to produce a better forecast than unequal weighting.
-For larger sample sizes, unequal weighting becomes more likely to perform better.
-But even for large training sample sizes, there is still a considerable number of cases, where equal weighting outperforms unequal weighting.
-Furthermore, the 3 scoring rules considered behave rather differently.
+For larger sample sizes, unequal weighting is more likely to produce a better forecast than equal weighting.
+But even for large training sample sizes, there is still a considerable fraction of cases, where equal weighting outperforms unequal weighting.
+Furthermore, the 3 scoring rules SQERR, CRPS, and LOGS behave markedly differently.
 The logarithmic score is much more likely to show an improved forecast due to unequal weightingthan the other two scores.
 The mean squared error is least likely to indicate an improvement of unequal over equal weighting.
 
+\section{Conclusions}
 
+We have presented analytical results and a simulation exercise to study the expected improvement of unequal weighting over equal weighting for post-processing seasonal forecasts.
+We found that unequal weighting is asymptotically superior to equal weighting, in a sense that expected verification scores obtained by unequal weighting are always better than for equal weighting, given that the parameters of the joint distribution of forecasts and observations are known.
+
+However, for the examples considered the potential improvement in scores is rather small.
+Furthermore, the improvement depends on the availability of a sufficiently large record of past forecasts and observations from which the post-processing weights can be estimated. 
+If the number of training samples is too small, the simpler post-processing strategy with equal weights outperforms post-processing with unequal weights.
+Lastly, the internal variability of the forecast and observation data does not guarantee that the optimal post-processing method with outperforms a sub-optimal method on any given forecast instance.
+
+These results can be used to guide the operational decision as to whether a democratic vote (equal weighting) should be used to combine several model forecasts into a single forecast, or whether more complicated combination schemes based on unequal weighting should be pursued.
 
 \end{document}
 

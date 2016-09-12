@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Arch Linux) (preloaded format=pdflatex 2016.1.19)  1 SEP 2016 15:55
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.9.2)  9 SEP 2016 10:26
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **equal-vs-unequal-weighting.tex
 (./equal-vs-unequal-weighting.tex
-LaTeX2e <2015/10/01> patch level 2
-Babel <3.9m> and hyphenation patterns for 79 languages loaded.
+LaTeX2e <2016/03/31> patch level 3
+Babel <3.9r> and hyphenation patterns for 83 language(s) loaded.
 (/usr/share/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
 (/usr/share/texmf-dist/tex/latex/base/size12.clo
@@ -37,24 +37,24 @@ Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
 \KV@toks@=\toks14
 )
 (/usr/share/texmf-dist/tex/latex/graphics/graphics.sty
-Package: graphics 2014/10/28 v1.0p Standard LaTeX Graphics (DPC,SPQR)
+Package: graphics 2016/07/10 v1.0t Standard LaTeX Graphics (DPC,SPQR)
 
 (/usr/share/texmf-dist/tex/latex/graphics/trig.sty
-Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
 )
-(/usr/share/texmf-dist/tex/latex/latexconfig/graphics.cfg
-File: graphics.cfg 2010/04/23 v1.9 graphics configuration of TeX Live
+(/usr/share/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
-Package graphics Info: Driver file: pdftex.def on input line 94.
+Package graphics Info: Driver file: pdftex.def on input line 99.
 
-(/usr/share/texmf-dist/tex/latex/pdftex-def/pdftex.def
-File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
+(/usr/share/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2016/07/10 v0.06j Graphics/color for pdfTeX
 
 (/usr/share/texmf-dist/tex/generic/oberdiek/infwarerr.sty
-Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
+Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
 )
 (/usr/share/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
-Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
 )
 \Gread@gobject=\count87
 ))
@@ -65,11 +65,10 @@ Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 Package: geometry 2010/09/12 v5.6 Page Geometry
 
 (/usr/share/texmf-dist/tex/generic/oberdiek/ifpdf.sty
-Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
-Package ifpdf Info: pdfTeX in PDF mode is detected.
+Package: ifpdf 2016/05/14 v3.1 Provides the ifpdf switch
 )
 (/usr/share/texmf-dist/tex/generic/oberdiek/ifvtex.sty
-Package: ifvtex 2010/03/01 v1.5 Detect VTeX and its facilities (HO)
+Package: ifvtex 2016/05/16 v1.6 Detect VTeX and its facilities (HO)
 Package ifvtex Info: VTeX not detected.
 )
 (/usr/share/texmf-dist/tex/generic/ifxetex/ifxetex.sty
@@ -93,7 +92,7 @@ Package: libertine 2014/11/25 (Bob Tennent) Supports Libertine and Biolinum fon
 ts for all LaTeX engines.
 
 (/usr/share/texmf-dist/tex/generic/oberdiek/ifluatex.sty
-Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
+Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
 Package ifluatex Info: LuaTeX not detected.
 )
 (/usr/share/texmf-dist/tex/latex/xkeyval/xkeyval.sty
@@ -108,7 +107,7 @@ Package: xkeyval 2014/12/03 v2.7a package option processing (HA)
 File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
 ))
 (/usr/share/texmf-dist/tex/latex/base/textcomp.sty
-Package: textcomp 2005/09/27 v1.99g Standard LaTeX package
+Package: textcomp 2016/06/19 v1.99m Standard LaTeX package
 Package textcomp Info: Sub-encoding information:
 (textcomp)               5 = only ISO-Adobe without \textcurrency
 (textcomp)               4 = 5 + \texteuro
@@ -199,7 +198,7 @@ LaTeX Info: Redefining \sffamily on input line 53.
 LaTeX Info: Redefining \ttfamily on input line 70.
 )
 (/usr/share/texmf-dist/tex/latex/base/fontenc.sty
-Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
+Package: fontenc 2016/06/19 v1.99m Standard LaTeX package
 )
 (/usr/share/texmf-dist/tex/latex/fontaxes/fontaxes.sty
 Package: fontaxes 2014/03/23 v1.0d Font selection axes
@@ -212,7 +211,7 @@ LaTeX Info: Redefining \oldstylenums on input line 478.
 
 (/usr/share/texmf-dist/tex/latex/libertine/LinLibertine_I.tex))
 (/usr/share/texmf-dist/tex/latex/csquotes/csquotes.sty
-Package: csquotes 2015/07/18 v5.1f context-sensitive quotations (JAW)
+Package: csquotes 2016/01/31 v5.1g context-sensitive quotations (JAW)
 
 (/usr/share/texmf-dist/tex/latex/etoolbox/etoolbox.sty
 Package: etoolbox 2015/08/02 v2.2a e-TeX tools for LaTeX (JAW)
@@ -227,7 +226,7 @@ Package: etoolbox 2015/08/02 v2.2a e-TeX tools for LaTeX (JAW)
 \csq@ltx@everypar=\toks18
 
 (/usr/share/texmf-dist/tex/latex/csquotes/csquotes.def
-File: csquotes.def 2015/07/18 v5.1f csquotes generic definitions (JAW)
+File: csquotes.def 2016/01/31 v5.1g csquotes generic definitions (JAW)
 )
 Package csquotes Info: Trying to load configuration file 'csquotes.cfg'...
 Package csquotes Info: ... configuration file loaded successfully.
@@ -236,7 +235,7 @@ Package csquotes Info: ... configuration file loaded successfully.
 File: csquotes.cfg 
 ))
 (/usr/share/texmf-dist/tex/latex/titlesec/titlesec.sty
-Package: titlesec 2011/12/15 v2.10.0 Sectioning titles
+Package: titlesec 2016/03/21 v2.10.2 Sectioning titles
 \ttl@box=\box26
 \beforetitleunit=\skip46
 \aftertitleunit=\skip47
@@ -274,40 +273,40 @@ Package Fancyhdr Warning: \fancyfoot's `E' option without twoside option is use
 less on input line 66.
 
 (/usr/share/texmf-dist/tex/latex/amsmath/amsmath.sty
-Package: amsmath 2013/01/14 v2.14 AMS math features
+Package: amsmath 2016/06/28 v2.15d AMS math features
 \@mathmargin=\skip58
 
 For additional information on amsmath, use the `?' option.
 (/usr/share/texmf-dist/tex/latex/amsmath/amstext.sty
-Package: amstext 2000/06/29 v2.01
+Package: amstext 2000/06/29 v2.01 AMS text
 
 (/usr/share/texmf-dist/tex/latex/amsmath/amsgen.sty
-File: amsgen.sty 1999/11/30 v2.0
+File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks21
 \ex@=\dimen119
 ))
 (/usr/share/texmf-dist/tex/latex/amsmath/amsbsy.sty
-Package: amsbsy 1999/11/29 v1.2d
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 \pmbraise@=\dimen120
 )
 (/usr/share/texmf-dist/tex/latex/amsmath/amsopn.sty
-Package: amsopn 1999/12/14 v2.01 operator names
+Package: amsopn 2016/03/08 v2.02 operator names
 )
 \inf@bad=\count100
-LaTeX Info: Redefining \frac on input line 210.
+LaTeX Info: Redefining \frac on input line 199.
 \uproot@=\count101
 \leftroot@=\count102
-LaTeX Info: Redefining \overline on input line 306.
+LaTeX Info: Redefining \overline on input line 297.
 \classnum@=\count103
 \DOTSCASE@=\count104
-LaTeX Info: Redefining \ldots on input line 378.
-LaTeX Info: Redefining \dots on input line 381.
-LaTeX Info: Redefining \cdots on input line 466.
+LaTeX Info: Redefining \ldots on input line 394.
+LaTeX Info: Redefining \dots on input line 397.
+LaTeX Info: Redefining \cdots on input line 518.
 \Mathstrutbox@=\box28
 \strutbox@=\box29
 \big@size=\dimen121
-LaTeX Font Info:    Redeclaring font encoding OML on input line 566.
-LaTeX Font Info:    Redeclaring font encoding OMS on input line 567.
+LaTeX Font Info:    Redeclaring font encoding OML on input line 634.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 635.
 \macc@depth=\count105
 \c@MaxMatrixCols=\count106
 \dotsspace@=\muskip10
@@ -328,8 +327,8 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 567.
 \multlinegap=\skip59
 \multlinetaggap=\skip60
 \mathdisplay@stack=\toks25
-LaTeX Info: Redefining \[ on input line 2665.
-LaTeX Info: Redefining \] on input line 2666.
+LaTeX Info: Redefining \[ on input line 2739.
+LaTeX Info: Redefining \] on input line 2740.
 )
 (/usr/share/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
@@ -342,12 +341,12 @@ LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 ))
 (/usr/share/texmf-dist/tex/latex/tools/bm.sty
-Package: bm 2014/10/28 v1.1c Bold Symbol Support (DPC/FMi)
+Package: bm 2016/07/07 v1.2b Bold Symbol Support (DPC/FMi)
 \symboldoperators=\mathgroup6
 \symboldletters=\mathgroup7
 \symboldsymbols=\mathgroup8
-LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 141.
-LaTeX Info: Redefining \bm on input line 207.
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 142.
+LaTeX Info: Redefining \bm on input line 208.
 )
 (/usr/share/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip11
@@ -386,7 +385,7 @@ LinuxLibertineT-TLF.
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
 (Font)              scaled to size 12.0pt on input line 82.
 
-(/usr/share/texmf-dist/tex/context/base/supp-pdf.mkii
+(/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count112
 \scratchdimen=\dimen128
@@ -400,7 +399,7 @@ LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
 \makeMPintoPDFobject=\count117
 \everyMPtoPDFconversion=\toks27
 ) (/usr/share/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
-Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
+Package: pdftexcmds 2016/05/21 v0.22 Utility functions of pdfTeX for LuaTeX (HO
 )
 Package pdftexcmds Info: LuaTeX not detected.
 Package pdftexcmds Info: \pdf@primitive is available.
@@ -408,31 +407,33 @@ Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode found.
 )
 (/usr/share/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
-Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
+Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
 
 (/usr/share/texmf-dist/tex/latex/oberdiek/grfext.sty
-Package: grfext 2010/08/19 v1.1 Manage graphics extensions (HO)
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
 
 (/usr/share/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
-Package: kvdefinekeys 2011/04/07 v1.3 Define keys (HO)
+Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
 ))
 (/usr/share/texmf-dist/tex/latex/oberdiek/kvoptions.sty
-Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
+Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
 
 (/usr/share/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
-Package: kvsetkeys 2012/04/25 v1.16 Key value parser (HO)
+Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
 
 (/usr/share/texmf-dist/tex/generic/oberdiek/etexcmds.sty
-Package: etexcmds 2011/02/16 v1.5 Avoid name clashes with e-TeX commands (HO)
+Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
 Package etexcmds Info: Could not find \expanded.
 (etexcmds)             That can mean that you are not using pdfTeX 1.50 or
 (etexcmds)             that some package has redefined \expanded.
 (etexcmds)             In the latter case, load this package earlier.
 )))
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+38.
 Package grfext Info: Graphics extension search list:
 (grfext)             [.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPE
 G,.JBIG2,.JB2,.eps]
-(grfext)             \AppendGraphicsExtensions on input line 452.
+(grfext)             \AppendGraphicsExtensions on input line 456.
 
 (/usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
@@ -535,94 +536,100 @@ LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/sc' will be
 (Font)              scaled to size 12.0pt on input line 155.
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/sc' will be
 (Font)              scaled to size 10.95pt on input line 155.
- [2] [3 <../R/enso_nao.pdf> <../R/enso_nao.pdf>] [4] [5]
-Overfull \hbox (16.8632pt too wide) in paragraph at lines 256--261
-\OT1/LinuxLibertineT-TLF/m/n/12 ran-dom vari-able $\OML/cmm/b/it/12 x \OMS/cmsy
-/m/n/12 ^^X N\OT1/cmr/m/n/12 (\OML/cmm/b/it/12 ^^V\OML/cmm/m/it/12 ; \OT1/cmr/b
-x/n/12 ^^F\OT1/cmr/m/n/12 )$ \OT1/LinuxLibertineT-TLF/m/n/12 then the lin-ear t
-rans-for-ma-tion $\OML/cmm/b/it/12 Ax \OMS/cmsy/m/n/12 ^^X N\OT1/cmr/m/n/12 (\O
-ML/cmm/b/it/12 A^^V\OML/cmm/m/it/12 ; \OML/cmm/b/it/12 A\OT1/cmr/bx/n/12 ^^F\OM
-L/cmm/b/it/12 A[]\OT1/cmr/m/n/12 )$\OT1/LinuxLibertineT-TLF/m/n/12 .
- []
+ [2] [3 <../R/enso_nao.pdf> <../R/enso_nao.pdf>] [4] [5] [6] [7]
 
-[6] [7]
-Overfull \hbox (5.31021pt too wide) in paragraph at lines 316--319
+LaTeX Warning: Citation `gneiting2007' on page 8 undefined on input line 313.
+
+
+Overfull \hbox (5.31021pt too wide) in paragraph at lines 317--320
 []\OT1/LinuxLibertineT-TLF/m/n/12 In all three post-processing sce-nar-ios (cli
 -ma-tol-ogy, equal weights, un-equal weights),
  []
 
 [8]
-Overfull \hbox (3.73848pt too wide) in paragraph at lines 351--354
-[]\OT1/LinuxLibertineT-TLF/m/n/12 For both ENSO and NAO, the un-equal weight-in
-g per-forms bet-ter than equal weight-
+Overfull \hbox (0.21503pt too wide) in paragraph at lines 357--360
+[]\OT1/LinuxLibertineT-TLF/m/n/12 The anal-y-sis il-lus-trates the mag-ni-tudes
+ of the po-ten-tial im-prove-ment that we might
  []
 
-[9] <../R/n-dependence.pdf, id=53, page=9, 505.89pt x 505.89pt>
+[9] <../R/n-dependence.pdf, id=53, page=15, 505.89pt x 505.89pt>
 File: ../R/n-dependence.pdf Graphic file (type pdf)
 
-<use ../R/n-dependence.pdf, page 9>
-Package pdftex.def Info: ../R/n-dependence.pdf, page9 used on input line 392.
+<use ../R/n-dependence.pdf, page 15>
+Package pdftex.def Info: ../R/n-dependence.pdf, page15 used on input line 394.
 (pdftex.def)             Requested size: 278.23828pt x 278.24034pt.
-
-
-LaTeX Warning: Reference `eq:???' on page 10 undefined on input line 402.
-
-
-LaTeX Warning: Reference `eq:???' on page 10 undefined on input line 402.
-
-<../R/n-dependence.pdf, id=54, page=3, 505.89pt x 505.89pt>
-File: ../R/n-dependence.pdf Graphic file (type pdf)
-
-<use ../R/n-dependence.pdf, page 3>
-Package pdftex.def Info: ../R/n-dependence.pdf, page3 used on input line 408.
-(pdftex.def)             Requested size: 238.49342pt x 238.49393pt.
-
-<../R/n-dependence.pdf, id=55, page=6, 505.89pt x 505.89pt>
-File: ../R/n-dependence.pdf Graphic file (type pdf)
-
-<use ../R/n-dependence.pdf, page 6>
-Package pdftex.def Info: ../R/n-dependence.pdf, page6 used on input line 409.
-(pdftex.def)             Requested size: 238.49342pt x 238.49393pt.
- [10] [11 <../R/n-dependence.pdf>] [12 <../R/n-dependence.pdf> <../R/n-dependen
-ce.pdf>]
-Overfull \hbox (3.97696pt too wide) in paragraph at lines 423--424
-[]\OT1/LinuxLibertineT-TLF/m/n/12 For large train-ing sam-ple sizes, un-equal w
-eight-ing out-per-forms equal weight-
- []
-
-<../R/n-dependence.pdf, id=72, page=7, 505.89pt x 505.89pt>
+ [10] [11 <../R/n-dependence.pdf>]
+<../R/n-dependence.pdf, id=67, page=7, 505.89pt x 505.89pt>
 File: ../R/n-dependence.pdf Graphic file (type pdf)
 
 <use ../R/n-dependence.pdf, page 7>
-Package pdftex.def Info: ../R/n-dependence.pdf, page7 used on input line 447.
-(pdftex.def)             Requested size: 278.23828pt x 278.24034pt.
+Package pdftex.def Info: ../R/n-dependence.pdf, page7 used on input line 415.
+(pdftex.def)             Requested size: 238.49342pt x 238.49393pt.
 
-<../R/n-dependence.pdf, id=73, page=8, 505.89pt x 505.89pt>
+<../R/n-dependence.pdf, id=68, page=1, 505.89pt x 505.89pt>
 File: ../R/n-dependence.pdf Graphic file (type pdf)
 
-<use ../R/n-dependence.pdf, page 8>
-Package pdftex.def Info: ../R/n-dependence.pdf, page8 used on input line 448.
-(pdftex.def)             Requested size: 278.23828pt x 278.24034pt.
+<use ../R/n-dependence.pdf, page 1>
+Package pdftex.def Info: ../R/n-dependence.pdf, page1 used on input line 416.
+(pdftex.def)             Requested size: 238.49342pt x 238.49393pt.
 
 
-LaTeX Warning: Float too large for page by 21.12677pt on input line 452.
+LaTeX Warning: Float too large for page by 5.38629pt on input line 420.
 
-[13] [14 <../R/n-dependence.pdf> <../R/n-dependence.pdf>]
+
+Overfull \hbox (2.75298pt too wide) in paragraph at lines 427--428
+[]\OT1/LinuxLibertineT-TLF/m/n/12 For large sam-ple sizes, un-equal weight-ing 
+out-per-forms cli-ma-tol-ogy and equal
+ []
+
+
+Overfull \hbox (20.28966pt too wide) in paragraph at lines 428--430
+[]\OT1/LinuxLibertineT-TLF/m/n/12 For small sam-ple sizes, how-ever, the ex-pec
+ted score is smaller for post-processing
+ []
+
+[12] [13 <../R/n-dependence.pdf> <../R/n-dependence.pdf>]
+<../R/n-dependence.pdf, id=83, page=14, 505.89pt x 505.89pt>
+File: ../R/n-dependence.pdf Graphic file (type pdf)
+
+<use ../R/n-dependence.pdf, page 14>
+Package pdftex.def Info: ../R/n-dependence.pdf, page14 used on input line 455.
+(pdftex.def)             Requested size: 238.49342pt x 238.49393pt.
+
+<../R/n-dependence.pdf, id=84, page=13, 505.89pt x 505.89pt>
+File: ../R/n-dependence.pdf Graphic file (type pdf)
+
+<use ../R/n-dependence.pdf, page 13>
+Package pdftex.def Info: ../R/n-dependence.pdf, page13 used on input line 456.
+(pdftex.def)             Requested size: 238.49342pt x 238.49393pt.
+
+Overfull \hbox (6.15018pt too wide) in paragraph at lines 472--474
+\OT1/LinuxLibertineT-TLF/m/n/12 pected im-prove-ment of un-equal weight-ing ove
+r equal weight-ing for post-processing
+ []
+
+
+Overfull \hbox (2.35089pt too wide) in paragraph at lines 475--479
+[]\OT1/LinuxLibertineT-TLF/m/n/12 However, for the ex-am-ples con-sid-ered the 
+po-ten-tial im-prove-ment in scores is rather
+ []
+
+[14] [15 <../R/n-dependence.pdf> <../R/n-dependence.pdf>]
 
 AED: lastpage setting LastPage
-[15] (./equal-vs-unequal-weighting.aux)
+[16] (./equal-vs-unequal-weighting.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 6438 strings out of 493054
- 95527 string characters out of 6140586
- 171486 words of memory out of 5000000
- 9822 multiletter control sequences out of 15000+600000
+ 6460 strings out of 493013
+ 95880 string characters out of 6139318
+ 172071 words of memory out of 5000000
+ 9863 multiletter control sequences out of 15000+600000
  22096 words of font info for 56 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 38i,11n,43p,815b,346s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 40i,11n,43p,815b,341s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/libertine/lbtn_tltjc6.enc}{/usr/share/
 texmf-dist/fonts/enc/dvips/libertine/lbtn_naooyc.enc}{/usr/share/texmf-dist/fon
 ts/enc/dvips/libertine/lbtn_lu7m2n.enc}{/usr/share/texmf-dist/fonts/enc/dvips/l
@@ -638,10 +645,10 @@ xmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/t
 ype1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/am
 sfonts/cm/cmsy6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8
 .pfb>
-Output written on equal-vs-unequal-weighting.pdf (15 pages, 338246 bytes).
+Output written on equal-vs-unequal-weighting.pdf (16 pages, 342684 bytes).
 PDF statistics:
- 139 PDF objects out of 1000 (max. 8388607)
- 98 compressed objects within 1 object stream
+ 150 PDF objects out of 1000 (max. 8388607)
+ 106 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
