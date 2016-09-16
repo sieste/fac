@@ -255,3 +255,76 @@ fa_ple = function(x, nf=1L, scaled=FALSE, Psi.lower=1e-6, C=0, warn.overpar=FALS
   return(ans)
 
 }
+
+
+#' 1-factor prediction function
+fa_pred = function(x_tr, y_tr, x_te) {
+
+  X_tr = cbind(y_tr, x_tr)
+  p = ncol(X_tr)
+
+  # mean and scale
+  Mu = colMeans(X_tr)
+  Sigma = colMeans(X_tr^2) - Mu^2
+  
+  # correlation matrix for scale-free factor analysis
+  S = cor(X_tr)
+
+  # function to calculate max-lik Lambda for a given Psi
+  FAout = function(Psi, S) {
+    Sstar = S * tcrossprod(1/sqrt(Psi))
+    E     = eigen(Sstar, symmetric = TRUE)
+    L     = E$vectors[, 1L, drop = FALSE]
+    load  = L * rep(sqrt(pmax(E$values[1L] - 1, 0)), each=ncol(S)) * sqrt(Psi)
+    return(load)
+  }
+  # function to calculate likelihood for a given Psi
+  FAfn = function(Psi, S) {
+    Sstar = S * tcrossprod(1/sqrt(Psi))
+    E     = eigen(Sstar, symmetric = TRUE, only.values = TRUE)
+    e     = E$values[-1L]
+    return(-sum(log(e) - e) - 1 + nrow(S))
+  }
+  # gradient of likelihood function
+  FAgr = function(Psi, S) {
+    Sstar = S * tcrossprod(1/sqrt(Psi))
+    E     = eigen(Sstar, symmetric = TRUE)
+    L     = E$vectors[, 1L, drop = FALSE]
+    load  = L * rep(sqrt(pmax(E$values[1L] - 1, 0)), each=ncol(S)) * sqrt(Psi)
+    g     = rowSums(load^2) + Psi - diag(S)
+    return(g/Psi^2)
+  }
+
+  # maximise likelihood
+  start = (1 - 0.5 / p) / diag(solve(S))
+  res   = optim(start, FAfn, FAgr, method = "L-BFGS-B", lower = 1e-6,
+                upper = 1, S = S)
+
+  # reconstruct Lambda and Psi
+  Lambda = drop(FAout(res$par, S))
+  if (Lambda[1L] < 0) {
+    Lambda = -1 * Lambda
+  }
+  Lambda = sqrt(Sigma) * Lambda
+  Psi = Sigma * Psi
+
+
+  # parameter estimation for post-processing
+  m_x = colMeans(x_tr)
+  m_y = mean(y_tr)
+  beta_fa = Lambda[1] / (1 + sum(Lambda^2 / Psi)) * Lambda[-1]/Psi[-1]
+  y_hat = m_y - sum(m_x * beta_fa) + x_tr %*% beta_fa
+  rss_fa = sum((y - y_hat)^2)
+
+  # prediction
+  m_pred = m_y + sum(beta_fa * (x_te - m_x))
+  # calculate (t(X) %*% X)^{-1} using maximum likelihood estimators of factor
+  # analysis; the inflation factor is (x0' (X'X)^-1 x0 + 1)
+  v_inflation = 1 + drop(x_te %*% solve(crossprod(X_tr)) %*% x_te)
+  dof = length(beta_fa) + 1
+  v_pred = rss_fa / (nrow(X_tr) - dof)
+
+  # return
+  return(c(m_pred, v_pred, v_inflation, dof))
+}
+

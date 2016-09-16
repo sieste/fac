@@ -3,8 +3,6 @@ library(mvtnorm)
 
 fa_mle = function(x, nf=1L, Psi.lower=1e-6) {
 
-  p = ncol(x)
-
   Mu = colMeans(x)
   Sigma = colMeans(x^2) - Mu^2
   
@@ -33,7 +31,7 @@ fa_mle = function(x, nf=1L, Psi.lower=1e-6) {
     return(g/Psi^2)
   }
 
-  start = (1 - 0.5 / p) / diag(solve(S))
+  start = (1 - 0.5 / ncol(x)) / diag(solve(S))
   res   = optim(start, FAfn, FAgr, method = "L-BFGS-B", lower = Psi.lower,
                 upper = 1, S = S)
 
@@ -55,7 +53,6 @@ function(Mu, S,
          n_vec = c(seq(10,100,10), seq(125,200,25))) 
 {
 
-  p = length(Mu)
   res = array(NA_real_, 
               dim=c(length(n_vec), n_mc, 9), 
               dimnames=list(
@@ -166,22 +163,6 @@ save(file='n-dependence.Rdata', list=c('res_enso', 'res_nao'))
 
 
 
-# CRPS of the non-standardised t-distribution (jordan 2015
-# https://github.com/FK83/scoringRules/blob/master/crps.pdf)
-crps_t = function(y, m, s, n) { 
-  z = (y - m) / s
-  return(s * (2 * dt(z, n) * (n + z^2) / (n-1) + z * (2 * pt(z, n) - 1) - 2 * sqrt(n) / (n-1) * beta(.5, n-.5) / beta(.5, .5*n)^2))
-}
-crps_n = function(y, m, s) { 
-  z = (y - m) / s
-  return(s * (2 * dnorm(z) + z * (2 * pnorm(z) - 1) - 1 / sqrt(pi)))
-}
-logs_t = function(y, m, s, n) {
-  return(-dt((y-m)/s, n, log=TRUE) + log(s))
-}
-logs_n = function(y, m, s) {
-  return(-dnorm((y-m)/s, log=TRUE) + log(s))
-}
 
 
 # calculate individual scores

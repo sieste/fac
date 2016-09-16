@@ -116,6 +116,6 @@ for (i_n in seq_along(n_vec)) {
 bias_var_err_nao = lst_nao
 bias_var_err_enso = lst_enso
 
-save('bias-variance-weights.Rdata', list=c('bias_var_err_nao', 'bias_var_err_enso'))
+save(file='bias-variance.Rdata', list=c('bias_var_err_nao', 'bias_var_err_enso'))
 
 
